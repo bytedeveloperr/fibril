@@ -63,6 +63,7 @@ export default defineComponent({
       try {
         await dashboard.loadDashboard()
       } catch (e) {
+        console.log(e)
         toast.error(e.message)
       }
     })

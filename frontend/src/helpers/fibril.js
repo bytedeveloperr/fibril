@@ -60,15 +60,16 @@ export const fibril = {
 
     for (let i = 0; i < result.activities.length; i++) {
       const activity = { ...result.activities[i] }
-
       const asset = data.find((token) => config.token[token.symbol].toLowerCase() === (activity.token === environment.nullAddress ? environment.nativeTokenAddress : activity.token))
-      if (!asset.logo) {
-        asset.logo = `/assets/images/${asset.symbol.toLowerCase()}.svg`
-      }
-      activity.value = asset ? activity.value / Math.pow(10, asset.decimals) : 0
-      activity.asset = asset
+      if (asset) {
+        if (!asset.logo) {
+          asset.logo = `/assets/images/${asset.symbol.toLowerCase()}.svg`
+        }
+        activity.value = asset ? activity.value / Math.pow(10, asset.decimals) : 0
+        activity.asset = asset
 
-      output.activities.push(activity)
+        output.activities.push(activity)
+      }
     }
 
     return output
