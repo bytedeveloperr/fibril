@@ -1,0 +1,32 @@
+specVersion: 0.0.2
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: Fibril
+    network: mumbai
+    source:
+      address: "0x965505b458b4c04773DfDfd7239bFCF138FAAe90"
+      abi: Fibril
+      startBlock: 26251454
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Creator
+        - Supporter
+        - TokenBalance
+        - Activity
+        - NftItem
+      abis:
+        - name: Fibril
+          file: ./abis/Fibril.json
+      eventHandlers:
+        - event: Support(indexed address,indexed address,indexed address,string,uint256,uint256)
+          handler: handleSupport
+        - event: Withdraw(indexed address,indexed address,indexed address,string,uint256,uint256)
+          handler: handleWithdraw
+        - event: Creator(indexed uint256,indexed address)
+          handler: handleCreator
+      file: ./src/mapping.ts
