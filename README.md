@@ -1,12 +1,12 @@
 ## FIBRIL
 
-Fibril is a decentralized platform where fans can support their favorite creators. It's basically a decentralized version of patreon
+Fibril is a decentralized platform where fans can support their favorite creators and their Projects with ERC20 tokens, NFTs, etc. Fibril iss basically a decentralized version of patreon and OpenCollective.
 
 ### Features
 
-Currently, The following features have been implemented
+Currently, The following features have been implemented and more will be implemented
 
-- Login by connecting metamask
+- Login by connecting with metamask or walletconnect
 - Update and Publish creator details
 - Upload creator's image to ipfs
 - Support creator with ERC20 Tokens (USDT, USDC and DAI) and MATIC
@@ -24,3 +24,5 @@ Currently, The following features have been implemented
 - Alchemy
 - IPFS (web3.storage and nft.storage)
 - Metamask
+
+The smart contract is being deployed to Polygon Mumbai Network
