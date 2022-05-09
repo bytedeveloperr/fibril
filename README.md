@@ -17,6 +17,8 @@ Currently, The following features have been implemented
 
 ### Techonologies
 
+- Solidity
+- Vue.js
 - Moralis
 - Thegraph
 - Alchemy
