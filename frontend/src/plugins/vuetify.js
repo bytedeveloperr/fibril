@@ -1,6 +1,5 @@
 import Vue from "vue"
 import Vuetify from "vuetify/lib/framework"
-import colors from "vuetify/lib/util/colors"
 
 Vue.use(Vuetify)
 
@@ -9,7 +8,7 @@ export const vuetify = new Vuetify({
     dark: false,
     themes: {
       light: {
-        primary: colors.indigo.accent4,
+        primary: "#5656d6",
       },
     },
   },

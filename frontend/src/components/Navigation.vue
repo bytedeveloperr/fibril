@@ -10,8 +10,12 @@
           </v-list-item-avatar>
 
           <v-list-item-content>
-            <v-list-item-title> {{ util.truncateEthAddress(auth.address) }}</v-list-item-title>
-            <v-list-item-subtitle class="green--text text--darken-3">Polygon Testnet</v-list-item-subtitle>
+            <v-list-item-title>
+              {{ util.truncateEthAddress(auth.address) }}</v-list-item-title
+            >
+            <v-list-item-subtitle class="green--text text--darken-3"
+              >Polygon Testnet</v-list-item-subtitle
+            >
           </v-list-item-content>
         </v-list-item>
       </template>
@@ -20,12 +24,23 @@
 
       <v-list dense>
         <template v-for="item in items">
-          <v-list-group :key="item.title" v-if="item.children" :prepend-icon="item.icon" no-action>
+          <v-list-group
+            :key="item.title"
+            v-if="item.children"
+            :prepend-icon="item.icon"
+            no-action
+          >
             <template v-slot:activator>
               <v-list-item-title>{{ item.title }}</v-list-item-title>
             </template>
 
-            <v-list-item v-for="({ title, icon, path }, i) in item.children" :key="i" link :to="path" active-class="primary lighten-5 primary--text">
+            <v-list-item
+              v-for="({ title, icon, path }, i) in item.children"
+              :key="i"
+              link
+              :to="path"
+              active-class="primary lighten-5 primary--text"
+            >
               <v-list-item-icon>
                 <v-icon>{{ icon }}</v-icon>
               </v-list-item-icon>
@@ -34,7 +49,13 @@
             </v-list-item>
           </v-list-group>
 
-          <v-list-item v-else :key="item.title" active-class="primary lighten-5 primary--text" link :to="item.path">
+          <v-list-item
+            v-else
+            :key="item.title"
+            active-class="primary lighten-5 primary--text"
+            link
+            :to="item.path"
+          >
             <v-list-item-icon>
               <v-icon>{{ item.icon }}</v-icon>
             </v-list-item-icon>
@@ -48,7 +69,9 @@
 
       <template v-slot:append>
         <div class="pa-2">
-          <v-btn class="grey lighten-1" elevation="0" block depressed @click="logOut">Logout</v-btn>
+          <v-btn dark block depressed elevation="0" @click="logOut">
+            Logout
+          </v-btn>
         </div>
       </template>
     </v-navigation-drawer>
@@ -59,18 +82,33 @@
 
       <v-spacer />
 
-      <v-btn class="primary" depressed dark link to="/connect" v-if="!auth.authenticated">Connect wallet</v-btn>
+      <v-btn
+        class="primary"
+        depressed
+        dark
+        link
+        to="/connect"
+        v-if="!auth.authenticated"
+        >Connect wallet</v-btn
+      >
 
       <v-menu offset-y v-else>
         <template v-slot:activator="{ on, attrs }">
-          <v-btn text v-bind="attrs" v-on="on">{{ util.truncateEthAddress(auth.address) }} <v-icon>mdi-chevron-down</v-icon></v-btn>
+          <v-btn text v-bind="attrs" v-on="on"
+            >{{ util.truncateEthAddress(auth.address) }}
+            <v-icon>mdi-chevron-down</v-icon></v-btn
+          >
         </template>
         <v-list outlined>
           <v-list-item link to="/account">
-            <v-list-item-title><v-icon>mdi-account</v-icon> Account</v-list-item-title>
+            <v-list-item-title
+              ><v-icon>mdi-account</v-icon> Account</v-list-item-title
+            >
           </v-list-item>
           <v-list-item link @click="logOut">
-            <v-list-item-title><v-icon>mdi-logout</v-icon> Logout</v-list-item-title>
+            <v-list-item-title
+              ><v-icon>mdi-logout</v-icon> Logout</v-list-item-title
+            >
           </v-list-item>
         </v-list>
       </v-menu>
@@ -93,8 +131,16 @@ export default defineComponent({
         title: "Discover",
         icon: "mdi-creation",
         children: [
-          { title: "Creators", icon: "mdi-account-multiple", path: "/discover/creators" },
-          { title: "Crates", icon: "mdi-cube-unfolded", path: "/discover/crates" },
+          {
+            title: "Creators",
+            icon: "mdi-account-multiple",
+            path: "/discover/creators",
+          },
+          {
+            title: "Crates",
+            icon: "mdi-cube-unfolded",
+            path: "/discover/crates",
+          },
         ],
       },
       { title: "NFT Marketplace", icon: "mdi-store", path: "/discover/nfts" },

@@ -18,7 +18,11 @@ const routes = [
   { path: "/account", name: "CreatorAccount", component: CreatorAccount },
   { path: "/withdraw", name: "WithdrawAsset", component: WithdrawAsset },
   { path: "/creator/:id", name: "ShowCreator", component: ShowCreator },
-  { path: "/creator/:id/support", name: "SupportCreator", component: SupportCreator },
+  {
+    path: "/creator/:id/support",
+    name: "SupportCreator",
+    component: SupportCreator,
+  },
   { path: "/nft/:id", name: "NftItem", component: NftItem },
 ]
 
@@ -27,5 +31,3 @@ export const router = new VueRouter({
   base: process.env.BASE_URL,
   routes,
 })
-
-// Decentralized support platform for creators and payment Businesses

@@ -1,8 +1,11 @@
 @import url("https://fonts.googleapis.com/css2?family=PT+Sans&display=swap");
 
-* {
+*,
+body {
   font-family: "PT Sans", sans-serif;
+  color: "#000000" !important;
 }
+
 .v-btn {
   text-transform: unset;
 }
