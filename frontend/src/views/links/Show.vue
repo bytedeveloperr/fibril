@@ -17,7 +17,7 @@
               <v-divider class="my-3" />
 
               <div class="my-5 text-center">
-                <p class="mb-2">You are about to support Abdulrahman with</p>
+                <p class="mb-2">You are about to support {{ userStore.data.name }} with</p>
                 <p class="h1 mt-2">
                   {{ linkStore.link.amount }} {{ linkStore.link.token && linkStore.link.token.symbol }}
                 </p>
@@ -72,6 +72,7 @@ export default defineComponent({
     onMounted(async () => {
       try {
         await linkStore.loadSupportLink($route.params.cid)
+        await userStore.getUser(linkStore.link.creator)
       } catch (e) {
         toast.error(e.message)
       }
@@ -100,7 +101,7 @@ export default defineComponent({
       loaders.submit = false
     }
 
-    return { authStore, linkStore, supportCreator, loaders }
+    return { authStore, userStore, linkStore, supportCreator, loaders }
   },
 })
 </script>
