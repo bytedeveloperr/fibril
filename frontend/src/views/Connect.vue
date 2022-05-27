@@ -41,7 +41,7 @@ export default defineComponent({
     async function authenticate(provider) {
       try {
         await authStore.authenticate(provider)
-        router.push("/")
+        router.push("/dashboard")
       } catch (e) {
         toast.error(e.message)
       }
