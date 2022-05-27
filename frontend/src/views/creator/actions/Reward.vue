@@ -7,7 +7,7 @@
         <h5 class="text-overline">Reward Supporters</h5>
         <v-btn text link @click="toggleCreateRewardModal" class="primary--text">create reward</v-btn>
       </div>
-      <p class="">This will pick your supporters randomly and send them some of your token balances</p>
+      <p class="">This will pick your supporters randomly and send them specified amount of your token balances</p>
 
       <v-card flat outlined class="mt-3">
         <v-card-text>
