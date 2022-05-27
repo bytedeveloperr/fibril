@@ -1,26 +1,48 @@
 <template>
   <v-app>
-    <Navigation v-if="!partialRoutes.includes($route.path)" />
-
-    <v-main>
-      <v-container>
+    <template v-if="$route.name == 'Home'">
+      <v-main>
         <router-view />
-      </v-container>
-    </v-main>
+      </v-main>
+    </template>
+
+    <template v-else>
+      <template v-if="!partialRoutes.includes($route.name)">
+        <Navigation />
+      </template>
+
+      <v-main>
+        <v-container :fill-height="partialRoutes.includes($route.name)">
+          <router-view />
+        </v-container>
+
+        <WrongNetwork />
+      </v-main>
+    </template>
   </v-app>
 </template>
 
 <script>
 import Navigation from "@/components/Navigation"
-import { defineComponent } from "@vue/composition-api"
+import WrongNetwork from "@/components/modals/WrongNetwork"
+import { defineComponent, watch } from "@vue/composition-api"
 import { provideToast } from "vue-toastification/composition"
+import { useAuthStore } from "@/stores/auth"
 
 export default defineComponent({
   name: "App",
-  components: { Navigation },
-  setup() {
-    const partialRoutes = ["/connect"]
+  components: { Navigation, WrongNetwork },
+
+  setup(_, ctx) {
     provideToast({ timeout: 3000 })
+
+    const authStore = useAuthStore()
+    const partialRoutes = ["Connect", "ShowSupportLink"]
+
+    watch(
+      () => authStore.address,
+      () => console.log(ctx.root.$router)
+    )
 
     return { partialRoutes }
   },

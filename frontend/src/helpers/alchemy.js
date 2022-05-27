@@ -11,6 +11,7 @@ export const alchemy = {
     const response = await request.get("/getNFTMetadata", {
       params: { contractAddress: address, tokenId, tokenType: type },
     })
+
     return response.data
   },
 }

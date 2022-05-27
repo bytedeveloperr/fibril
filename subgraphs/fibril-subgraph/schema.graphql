@@ -1,0 +1,65 @@
+type Creator @entity {
+  id: ID!
+  address: Bytes!
+  tokenBalances: [TokenBalance!]! @derivedFrom(field: "creator")
+  supporters: [Supporter!]! @derivedFrom(field: "creator")
+  activities: [Activity!]! @derivedFrom(field: "creator")
+  nfts: [NftItem!]! @derivedFrom(field: "creator")
+}
+
+type TokenBalance @entity {
+  id: Bytes!
+  amount: BigInt!
+  creator: Creator!
+  token: Bytes!
+}
+
+type SupportAmount @entity {
+  id: Bytes!
+  amount: BigInt!
+  creator: Creator!
+  supporter: Supporter!
+  token: Bytes!
+}
+
+type Activity @entity {
+  id: Bytes!
+  type: String!
+  method: String!
+  token: Bytes!
+  to: Bytes!
+  from: Bytes!
+  value: BigInt!
+  timestamp: BigInt!
+  creator: Creator!
+}
+
+type NftItem @entity {
+  id: Bytes!
+  address: Bytes!
+  tokenId: BigInt!
+  owner: Bytes!
+  paymentToken: Bytes!
+  tokenType: String!
+  isSold: Boolean!
+  timestamp: BigInt!
+  creator: Creator!
+}
+
+type Supporter @entity {
+  id: Bytes!
+  creator: Creator!
+  address: Bytes!
+  supports: [SupportAmount!]! @derivedFrom(field: "supporter")
+}
+
+type Reward @entity {
+  id: ID!
+  status: String!
+  token: Bytes!
+  winnersCount: BigInt!
+  amountPerWinner: BigInt!
+  winners: [Bytes!]
+  timestamp: BigInt!
+  creator: Creator!
+}

@@ -1,24 +1,33 @@
 import Moralis from "moralis"
 import { environment } from "../config/environment"
-import { useAuth } from "../stores/auth"
+import { SupportLink } from "../config/objects"
+import { useAuthStore } from "../stores/auth"
 
 Moralis.onAccountChanged(async () => {
-  const auth = useAuth()
-  await auth.authenticate(auth.provider, { refresh: true })
+  const authStore = useAuthStore()
+  await authStore.authenticate(authStore.provider, { refresh: true })
 })
 
 Moralis.onDisconnect(async () => {
-  const auth = useAuth()
-  await auth.destroy()
+  const authStore = useAuthStore()
+  await authStore.destroy()
+})
+
+Moralis.onChainChanged((chainId) => {
+  const authStore = useAuthStore()
+  authStore.updateChainId(chainId)
 })
 
 export const moralis = {
-  initialize() {
+  async initialize() {
     const serverUrl = environment.moralisServerUrl
     const appId = environment.moralisAppId
     Moralis.start({ serverUrl, appId })
 
-    Moralis.enableWeb3()
+    await Moralis.enableWeb3()
+
+    // const chainId = await web3..getChainId()
+    // console.log(chainId)
   },
 
   async authenticate(provider, options = {}) {
@@ -56,6 +65,10 @@ export const moralis = {
     return await Moralis.Web3API.native.runContractFunction(options)
   },
 
+  getChainId() {
+    return parseInt(Moralis.getChainId())
+  },
+
   data: {
     async getUser(address) {
       if (!address) {
@@ -73,8 +86,43 @@ export const moralis = {
       user.set("longDescription", data.longDescription)
       user.set("isPublished", data.isPublished)
       user.set("avatar", data.avatar)
+      user.set("facebook", data.facebook)
+      user.set("twitter", data.twitter)
+      user.set("linkedin", data.linkedin)
+      user.set("instagram", data.instagram)
+      user.set("tiktok", data.tiktok)
+      user.set("youtube", data.youtube)
 
       await user.save()
+    },
+
+    async createSupportLink(data) {
+      const link = new SupportLink()
+
+      link.set("cid", data.cid)
+      link.set("title", data.title)
+      link.set("description", data.description)
+      link.set("creator", data.creator)
+      link.set("amount", data.amount)
+      link.set("token", data.token)
+      link.set("redirectTo", data.redirectTo)
+      link.set("timestamp", data.timestamp)
+
+      await link.save()
+    },
+
+    async getSupportLinks(address) {
+      const query = new Moralis.Query(SupportLink)
+      query.equalTo("creator", address)
+
+      return await query.find()
+    },
+
+    async getSupportLink(cid) {
+      const query = new Moralis.Query(SupportLink)
+      query.equalTo("cid", cid)
+
+      return await query.first()
     },
 
     async getCreators() {

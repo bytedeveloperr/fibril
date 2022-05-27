@@ -1,7 +1,7 @@
 <template>
   <v-list two-line class="pt-0">
     <template v-for="(balance, i) in balances">
-      <v-list-item :key="'balance' + i" link>
+      <v-list-item :key="'balance' + i">
         <v-list-item-avatar>
           <v-img :src="balance.logo" :alt="balance.name" />
         </v-list-item-avatar>

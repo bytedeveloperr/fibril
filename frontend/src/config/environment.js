@@ -8,4 +8,8 @@ export const environment = {
   moralisServerUrl: process.env.VUE_APP_MORALIS_SERVER_URL,
   moralisAppId: process.env.VUE_APP_MORALIS_APP_ID,
   web3StorageToken: process.env.VUE_APP_WEB3_STORAGE_TOKEN,
+  chainId: process.env.VUE_APP_CHAIN_ID,
+  explorerUrl: process.env.VUE_APP_EXPLORER_URL,
+  priceFeedContractAddress: process.env.VUE_APP_PRICE_FEED_CONTRACT_ADDRESS,
+  networkName: process.env.VUE_APP_NETWORK_NAME,
 }

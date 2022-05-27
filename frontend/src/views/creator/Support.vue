@@ -1,15 +1,21 @@
 <template>
   <v-row>
-    <Loader v-if="user.loading" />
+    <Loader v-if="loaders.mount" />
 
     <v-col v-else md="6" class="mx-auto">
-      <p class="h1">Support {{ user.data.name }}</p>
+      <p class="h1">Support {{ userStore.data.name }}</p>
 
       <v-form @submit.prevent="handleFormSubmit">
-        <v-select placeholder="Select Support Method" v-model="data.method" :items="methods" />
+        <v-select placeholder="Select Support Method" v-model="data.method" :items="config.methods" />
 
         <template v-if="data.method == 'Token'">
-          <v-select label="Select Asset" :items="dashboard.balances" item-text="symbol" item-value="address" v-model="data.asset" />
+          <v-select
+            label="Select Asset"
+            :items="config.tokens"
+            item-text="symbol"
+            item-value="address"
+            v-model="data.asset"
+          />
           <v-text-field placeholder="Enter Amount" v-model="data.amount" />
         </template>
 
@@ -18,7 +24,7 @@
           <v-text-field placeholder="Enter Token ID" v-model="data.tokenId" />
         </template>
 
-        <v-btn depressed block rounded type="submit" class="primary">Continue</v-btn>
+        <v-btn depressed block rounded :disabled="loaders.submit" type="submit" class="primary">Continue</v-btn>
       </v-form>
     </v-col>
   </v-row>
@@ -31,38 +37,70 @@
 </style>
 
 <script>
-import { defineComponent, onMounted, reactive } from "@vue/composition-api"
-import { router } from "@/router"
-import { useUser } from "@/stores/user"
-import { useAuth } from "@/stores/auth"
-import { useDashboard } from "@/stores/dashboard"
 import Loader from "@/components/Loader"
+import { config } from "@/config/config"
+import { useUserStore } from "@/stores/user"
+import { useAuthStore } from "@/stores/auth"
+import { useToast } from "vue-toastification/composition"
+import { defineComponent, onMounted, reactive } from "@vue/composition-api"
 
 export default defineComponent({
   components: { Loader },
 
-  setup() {
-    const user = useUser()
-    const auth = useAuth()
-    const dashboard = useDashboard()
-    const methods = ["NFT", "Token"]
+  setup(_, ctx) {
+    const { $route, $router } = ctx.root
+
+    const toast = useToast()
+    const userStore = useUserStore()
+    const authStore = useAuthStore()
+    const loaders = reactive({ submit: false, mount: false })
     const data = reactive({ method: null, amount: null, contract: null, tokenId: null, asset: null })
 
     onMounted(async () => {
-      await user.getUser(router.currentRoute.params.id)
-      await dashboard.loadBalances()
+      loaders.mount = true
+
+      try {
+        await userStore.getUser($route.params.id)
+      } catch (e) {
+        toast.error(e.message)
+      }
+
+      loaders.mount = false
     })
 
     async function handleFormSubmit() {
-      if (data.method == "Token") {
-        const asset = dashboard.balances.find((balance) => balance.address == data.asset)
-        await user.supportCreator({ method: data.method, amount: data.amount, asset: asset, creator: user.data.address, supporter: auth.address })
-      } else if (data.method == "NFT") {
-        await user.supportCreator({ method: data.method, creator: user.data.address, supporter: auth.address, contract: data.contract, tokenId: data.tokenId })
+      loaders.submit = true
+
+      try {
+        if (data.method == "Token") {
+          const asset = config.tokens.find((balance) => balance.address == data.asset)
+          await userStore.supportCreator({
+            method: data.method,
+            amount: data.amount,
+            asset: asset,
+            creator: userStore.data.address,
+            supporter: authStore.address,
+          })
+        } else if (data.method == "NFT") {
+          await userStore.supportCreator({
+            method: data.method,
+            creator: userStore.data.address,
+            supporter: authStore.address,
+            contract: data.contract,
+            tokenId: data.tokenId,
+          })
+        }
+
+        toast.success("Creator supported successfully")
+        $router.push(`/creator/${$route.params.id}`)
+      } catch (e) {
+        toast.error(e.data?.message || e.message)
       }
+
+      loaders.submit = false
     }
 
-    return { user, methods, data, dashboard, handleFormSubmit }
+    return { userStore, config, data, handleFormSubmit, loaders }
   },
 })
 </script>

@@ -1,0 +1,10 @@
+type Listing @entity {
+  id: ID!
+  address: Bytes!
+  paymentToken: Bytes!
+  listedBy: Bytes!
+  tokenId: BigInt!
+  pricePerItem: BigInt!
+  listedAt: BigInt!
+  status: String!
+}

@@ -25,11 +25,13 @@
 <script>
 import { defineComponent } from "@vue/composition-api"
 import { router } from "../router"
-import { useAuth } from "@/stores/auth"
+import { useAuthStore } from "@/stores/auth"
+import { useToast } from "vue-toastification/composition"
 
 export default defineComponent({
   setup() {
-    const auth = useAuth()
+    const toast = useToast()
+    const authStore = useAuthStore()
 
     const providers = [
       { title: "Metamask", image: "/assets/images/metamask.svg" },
@@ -37,8 +39,12 @@ export default defineComponent({
     ]
 
     async function authenticate(provider) {
-      await auth.authenticate(provider)
-      router.push("/")
+      try {
+        await authStore.authenticate(provider)
+        router.push("/")
+      } catch (e) {
+        toast.error(e.message)
+      }
     }
 
     return { providers, authenticate }

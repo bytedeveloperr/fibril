@@ -1,0 +1,26 @@
+specVersion: 0.0.2
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: Utility
+    network: mumbai
+    source:
+      address: "0x9E13d82885302629a7bc54f75C35aA585886c6d1"
+      abi: Utility
+      startBlock: 26491347
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Listing
+      abis:
+        - name: Utility
+          file: ./abis/Utility.json
+      eventHandlers:
+        - event: Listed(indexed address,indexed address,indexed address,uint256,uint256,uint256,uint256)
+          handler: handleListed
+        - event: ListingClosed(uint256)
+          handler: handleListingClosed
+      file: ./src/mapping.ts

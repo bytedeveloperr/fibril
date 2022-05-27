@@ -1,32 +1,119 @@
 <template>
-  <v-card flat outlined height="400">
+  <v-card flat outlined height="420">
     <router-link :to="`/nft/${item.address}:${item.tokenId}`">
       <v-img :src="(item.metadata && item.metadata.image) || '/assets/images/not-found.png'" height="300" />
     </router-link>
 
     <v-card-text class="pb-0">
-      <router-link :to="`/nft/${item.address}:${item.tokenId}`">
-        <div class="d-flex justify-space-between">
-          <p class="h4 mb-3 font-weight-bold">{{ item.metadata && item.metadata.name }}</p>
-          <p class="text-small">{{ item.price }} USDC</p>
-        </div>
-      </router-link>
-
       <div class="d-flex justify-space-between">
-        <v-btn text link outlined shaped class="primary--text" v-if="item.isListed">Buy</v-btn>
-        <v-btn text link outlined shaped disabled class="primary--text disabled" v-else>Not for sale</v-btn>
+        <router-link :to="`/nft/${item.address}:${item.tokenId}`">
+          <p class="h4 py-1 font-weight-bold">{{ item.metadata && item.metadata.name }}</p>
+        </router-link>
+        <p class="h4">
+          <v-btn icon shaped link class="pa-1">
+            <v-icon>mdi-heart-outline</v-icon>
+          </v-btn>
 
-        <v-btn icon shaped link><v-icon>mdi-heart-outline</v-icon></v-btn>
+          <span>3</span>
+        </p>
       </div>
+
+      <template v-if="(item.owner && item.owner.toLowerCase()) === authStore.address.toLowerCase()">
+        <v-btn
+          depressed
+          block
+          class="mb-5 primary--text"
+          v-if="(item.sale && item.sale.status) != 'Active'"
+          @click="toggleListingModal"
+        >
+          <v-icon>mdi-sale</v-icon> Sell Item
+        </v-btn>
+        <v-btn v-else depressed block :disabled="loaders.close" class="mb-5 primary--text" @click="closeNftListing">
+          <v-icon>mdi-sale</v-icon> Close Sale
+        </v-btn>
+      </template>
+
+      <template v-else>
+        <v-btn
+          depressed
+          link
+          block
+          class="primary--text"
+          :disabled="loaders.buy"
+          v-if="(item.sale && item.sale.status) === 'Active'"
+          @click="buyNftItem"
+        >
+          Buy for {{ item.sale && item.sale.pricePerItem }} {{ item.sale && item.sale.paymentToken.symbol }}
+        </v-btn>
+
+        <v-btn depressed block disabled class="primary--text" v-else>NFT is not for sale</v-btn>
+      </template>
     </v-card-text>
+
+    <ListNftModal :address="item.address" :tokenId="item.tokenId" />
   </v-card>
 </template>
 
 <script>
-import { defineComponent } from "@vue/composition-api"
+import { defineComponent, provide, reactive, ref } from "@vue/composition-api"
+import ListNftModal from "@/components/modals/ListNft"
+import NftListingList from "@/components/lists/NftListing"
+import { useToast } from "vue-toastification/composition"
 
 export default defineComponent({
-  props: ["item"],
+  props: ["item", "authStore", "nftStore"],
+  components: { ListNftModal, NftListingList },
+
+  setup(props) {
+    const { nftStore, item } = props
+    const showListingModal = ref(null)
+    const toast = useToast()
+    const loaders = reactive({ mount: false, buy: false, close: false })
+
+    async function closeNftListing() {
+      loaders.close = true
+
+      try {
+        const data = { address: item.address, tokenId: item.tokenId }
+        await nftStore.closeNftListing(data)
+        toast.success("Listing closed successfully")
+      } catch (e) {
+        toast.error(e.data?.message || e.message)
+      }
+
+      loaders.close = false
+    }
+
+    async function buyNftItem() {
+      loaders.buy = true
+
+      try {
+        const data = {
+          address: item.address,
+          tokenId: item.tokenId,
+          creator: item.creator.address,
+          amount: item.sale.pricePerItem,
+          paymentToken: item.sale.paymentToken,
+        }
+
+        await nftStore.buyNftItem(data)
+        toast.success("Item successfully bought")
+      } catch (e) {
+        toast.error(e.data?.message || e.message)
+      }
+
+      loaders.buy = false
+    }
+
+    function toggleListingModal() {
+      showListingModal.value = !showListingModal.value
+    }
+
+    provide("showListingModal", showListingModal)
+    provide("toggleListingModal", toggleListingModal)
+
+    return { toggleListingModal, buyNftItem, showListingModal, closeNftListing, loaders }
+  },
 })
 </script>
 
@@ -35,8 +122,17 @@ export default defineComponent({
   font-size: 16px;
 }
 
+.small-text {
+  font-size: 12px;
+}
+
 a {
   color: inherit !important;
   text-decoration: none !important;
+}
+
+.v-btn--icon.v-size--default {
+  width: unset;
+  height: unset;
 }
 </style>

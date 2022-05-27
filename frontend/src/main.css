@@ -1,11 +1,26 @@
-@import url("https://fonts.googleapis.com/css2?family=PT+Sans&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Jacques+Francois+Shadow&display=swap");
 
 *,
 body {
-  font-family: "PT Sans", sans-serif;
-  color: "#000000" !important;
+  font-family: "Space Grotesk", sans-serif;
 }
 
-.v-btn {
+body,
+.v-card__text {
+  color: #1d1d1d !important;
+}
+
+.v-btn,
+.v-tab {
   text-transform: unset;
+}
+
+.text-small {
+  font-size: 14px !important;
+}
+
+.v-toolbar__title,
+.app-text-logo {
+  font-family: "Jacques Francois Shadow", cursive;
 }

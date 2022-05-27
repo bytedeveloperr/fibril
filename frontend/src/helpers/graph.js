@@ -1,7 +1,12 @@
 import { ApolloClient, InMemoryCache, gql } from "@apollo/client"
 
-const url = "https://api.thegraph.com/subgraphs/name/bytedeveloperr/fibril"
-const client = new ApolloClient({ uri: url, cache: new InMemoryCache() })
+const fibrilUrl = "https://api.thegraph.com/subgraphs/name/bytedeveloperr/fibril"
+const marketplaceUrl = "https://api.thegraph.com/subgraphs/name/bytedeveloperr/fibril-nft-utility"
+
+const fibrilClient = new ApolloClient({ uri: fibrilUrl, cache: new InMemoryCache() })
+const marketplaceClient = new ApolloClient({ uri: marketplaceUrl, cache: new InMemoryCache() })
+
+const options = { fetchPolicy: "no-cache" }
 
 export const graph = {
   async getDashboardData(address) {
@@ -28,7 +33,7 @@ export const graph = {
       }
     `
 
-    const data = await client.query({ query: query, variables: { address } })
+    const data = await fibrilClient.query({ query, ...options, variables: { address } })
     return data.data.creators[0] || { tokenBalances: [], activities: [] }
   },
 
@@ -46,7 +51,7 @@ export const graph = {
       }
     `
 
-    const data = await client.query({ query: query, variables: { address } })
+    const data = await fibrilClient.query({ query, ...options, variables: { address } })
     return data.data.creators[0]?.tokenBalances || []
   },
 
@@ -56,7 +61,7 @@ export const graph = {
         creators(where: { address: $address }) {
           id
           address
-          activities(first: 5) {
+          activities {
             id
             type
             from
@@ -69,8 +74,54 @@ export const graph = {
       }
     `
 
-    const data = await client.query({ query: query, variables: { address } })
+    const data = await fibrilClient.query({ query, ...options, variables: { address } })
     return data.data.creators[0]?.activities || []
+  },
+
+  async getSupporters(address) {
+    const query = gql`
+      query GetCreatorSupporters($address: Bytes!) {
+        creators(where: { address: $address }) {
+          id
+          address
+          supporters {
+            id
+            address
+            supports {
+              id
+              amount
+              token
+            }
+          }
+        }
+      }
+    `
+
+    const data = await fibrilClient.query({ query, ...options, variables: { address } })
+    return data.data.creators[0]?.supporters || []
+  },
+
+  async getSupporter(id) {
+    const query = gql`
+      query GetSupporter($id: Bytes!) {
+        supporters(where: { id: $id }) {
+          id
+          address
+          creator {
+            id
+            address
+          }
+          supports {
+            id
+            amount
+            token
+          }
+        }
+      }
+    `
+
+    const data = await fibrilClient.query({ query, ...options, variables: { id } })
+    return data.data.supporters[0]
   },
 
   async getNfts() {
@@ -80,10 +131,9 @@ export const graph = {
           id
           address
           tokenId
-          seller
           paymentToken
-          isListed
-          price
+          isSold
+          owner
           creator {
             address
           }
@@ -91,8 +141,13 @@ export const graph = {
       }
     `
 
-    const data = await client.query({ query: query })
+    const data = await fibrilClient.query({ query })
     return data.data.nftItems
+  },
+
+  async getCreatorNfts(address) {
+    const ntfs = await this.getNfts()
+    return ntfs.filter((nft) => nft.creator.address.toLowerCase() == address.toLowerCase())
   },
 
   async getNftItem(address, tokenId) {
@@ -102,10 +157,9 @@ export const graph = {
           id
           address
           tokenId
-          seller
           paymentToken
-          isListed
-          price
+          isSold
+          owner
           creator {
             address
           }
@@ -113,7 +167,48 @@ export const graph = {
       }
     `
 
-    const data = await client.query({ query: query, variables: { address, id: tokenId } })
+    const data = await fibrilClient.query({ query, ...options, variables: { address, id: tokenId } })
     return data.data.nftItems[0]
+  },
+
+  async getNftListings(address, tokenId) {
+    const query = gql`
+      query GetNftListings($address: Bytes!, $tokenId: BigInt!) {
+        listings(where: { address: $address, tokenId: $tokenId }) {
+          id
+          address
+          paymentToken
+          listedBy
+          pricePerItem
+          tokenId
+          status
+        }
+      }
+    `
+
+    const data = await marketplaceClient.query({ query, ...options, variables: { address, tokenId } })
+    return data.data.listings
+  },
+
+  async getCreatorRewards(address) {
+    const query = gql`
+      query GetCreatorRewards {
+        rewards {
+          id
+          amountPerWinner
+          winnersCount
+          token
+          winners
+          status
+          timestamp
+          creator {
+            address
+          }
+        }
+      }
+    `
+
+    const data = await fibrilClient.query({ query, ...options })
+    return (data.data.rewards || []).filter((a) => a.creator.address.toLowerCase() === address.toLowerCase())
   },
 }

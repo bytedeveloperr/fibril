@@ -15,7 +15,100 @@ export const fibrilABI = [
         type: "address",
       },
     ],
-    name: "Creator",
+    name: "CreatorCreated",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: "address",
+        name: "creator",
+        type: "address",
+      },
+      {
+        indexed: true,
+        internalType: "address",
+        name: "buyer",
+        type: "address",
+      },
+      {
+        indexed: true,
+        internalType: "address",
+        name: "nftAddress",
+        type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "tokenId",
+        type: "uint256",
+      },
+    ],
+    name: "NftSold",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: "address",
+        name: "creator",
+        type: "address",
+      },
+      {
+        indexed: true,
+        internalType: "address",
+        name: "token",
+        type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "uint32",
+        name: "winnersCount",
+        type: "uint32",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "requestId",
+        type: "uint256",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "amountPerWinner",
+        type: "uint256",
+      },
+    ],
+    name: "RewardCreated",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "requestId",
+        type: "uint256",
+      },
+      {
+        indexed: false,
+        internalType: "address[]",
+        name: "winners",
+        type: "address[]",
+      },
+      {
+        indexed: false,
+        internalType: "string",
+        name: "status",
+        type: "string",
+      },
+    ],
+    name: "RewardUpdated",
     type: "event",
   },
   {
@@ -126,11 +219,98 @@ export const fibrilABI = [
       },
       {
         internalType: "address",
+        name: "_nftAddress",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "_tokenId",
+        type: "uint256",
+      },
+      {
+        internalType: "address",
+        name: "_paymentToken",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "_amount",
+        type: "uint256",
+      },
+    ],
+    name: "buyItem",
+    outputs: [],
+    stateMutability: "payable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "_nftAddress",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "_tokenId",
+        type: "uint256",
+      },
+    ],
+    name: "closeNftListing",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "_address",
+        type: "address",
+      },
+    ],
+    name: "getCreator",
+    outputs: [
+      {
+        components: [
+          {
+            internalType: "address",
+            name: "addr",
+            type: "address",
+          },
+          {
+            internalType: "uint256",
+            name: "id",
+            type: "uint256",
+          },
+          {
+            internalType: "uint256",
+            name: "supportersCount",
+            type: "uint256",
+          },
+        ],
+        internalType: "struct Fibril.Creator",
+        name: "",
+        type: "tuple",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "_creator",
+        type: "address",
+      },
+      {
+        internalType: "address",
         name: "_token",
         type: "address",
       },
     ],
-    name: "getBalance",
+    name: "getCreatorBalance",
     outputs: [
       {
         internalType: "uint256",
@@ -161,8 +341,18 @@ export const fibrilABI = [
         name: "_creator",
         type: "address",
       },
+      {
+        internalType: "address",
+        name: "_supporter",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "_token",
+        type: "address",
+      },
     ],
-    name: "getCreatorId",
+    name: "getSupporterContribution",
     outputs: [
       {
         internalType: "uint256",
@@ -174,8 +364,65 @@ export const fibrilABI = [
     type: "function",
   },
   {
-    inputs: [],
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "_requestId",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256[]",
+        name: "_randomWords",
+        type: "uint256[]",
+      },
+    ],
+    name: "handleFulfilRandomWords",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "_nftUtilityAddress",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "_randomWordsGeneratorAddress",
+        type: "address",
+      },
+    ],
     name: "initialize",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "_nftAddress",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "_tokenId",
+        type: "uint256",
+      },
+      {
+        internalType: "address",
+        name: "_paymentToken",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "_pricePerItem",
+        type: "uint256",
+      },
+    ],
+    name: "listNft",
     outputs: [],
     stateMutability: "nonpayable",
     type: "function",
@@ -212,6 +459,29 @@ export const fibrilABI = [
       },
     ],
     stateMutability: "pure",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint32",
+        name: "_winnersCount",
+        type: "uint32",
+      },
+      {
+        internalType: "address",
+        name: "_token",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "_amountPerWinner",
+        type: "uint256",
+      },
+    ],
+    name: "rewardRandomSupporters",
+    outputs: [],
+    stateMutability: "nonpayable",
     type: "function",
   },
   {

@@ -10,3 +10,4 @@ artifacts
 
 .vscode
 .openzeppelin
+.t.sol

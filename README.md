@@ -1,29 +1,47 @@
 ## FIBRIL
 
-Fibril is a decentralized platform where fans can support their favorite creators and their Projects with ERC20 tokens, NFTs, etc. Fibril is basically a decentralized version of patreon and OpenCollective.
+**Decentralized global creator support platform that allows fans to support Creators with Cryptocurrencies and NFTs**
 
-### Features
+Basically, a "Decentralized Patreon"
 
-Currently, The following features have been implemented and more will be implemented
+### Problem
 
-- Login by connecting with metamask or walletconnect
-- Update and Publish creator details
-- Upload creator's image to ipfs
-- Support creator with ERC20 Tokens (USDT, USDC and DAI) and MATIC
-- Support creator with NFT
-- Explore Creators and NFTs
-- Creator funds withdrawal
-- Creator dashboard
+The current and most popular creator support platforms are centralized and not censorship resistand. There have been many reports of these platforms suspending and deplatforming creators, which make it impossible for the creators to access their funds.
+
+Also, Some of these platforms are not available in some regions and countries which leaves the creators in those regions/countries at a disadvantage.
+
+### Solution
+
+Fibril is a decentralized creator support platform that allows fans (A.K.A supporters) to support their favorite creators and idols with crypto tokens and NFTs.
+
+Creators and Supporters can access the platform from any region/country in the world without any fear of account suspension or deplatforming because the core and main features of the platform are smart contracts written and deployed to the blockchain network.
+
+Creators can be supported with crypto tokens which are MATIC, DAI, USDT and USDC. They can also be supported with NFTs.
+
+Some of the current features of Fibril:
+
+- Dashboard (for creators)
+- Creator support with crypto tokens
+- Creator support with NFTs
+- Selling of NFTs by creators
+- Buying of creators NFTs
+- Withdrawal of crypto tokens and NFTs
+- Creation of support links (payment links but for supporting creators)
+- Random reward of supporters (randomness powered by Chainlink VRF)
+- Creator's page
+- Addition Social profile
 
 ### Techonologies
 
-- Solidity
-- Vue.js
-- Moralis
-- Thegraph
-- Alchemy
-- IPFS (web3.storage and nft.storage)
-- Metamask
-- Chainlink (to be integrated)
+- Solidity - The smart contracts is written in solidity
+- Vue.js - The frontend is built with Vue.js
+- Moralis - Moralis powers the connection of user's wallet, interacting with smart contracts, database and lot more.
+- The Graph Protocol - The graph protocol is used to index the smart contract data
+- Alchemy - Alchemy powers the NFTs data and metadata retreival
+- IPFS (web3.storage and nft.storage) - IPFS is used to store creators profile images and support links JSON
+- Chainlink - Powers the tokens price smart contract and Random number generation
+- Polygon - The smart contracts are deployed to Polygon Mumbai
+
+### Deployments
 
 The smart contract is being deployed to Polygon Mumbai Network

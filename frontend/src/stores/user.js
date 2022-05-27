@@ -2,8 +2,25 @@ import { defineStore } from "pinia"
 import { fibril } from "../helpers/fibril"
 import { moralis } from "../helpers/moralis"
 
-export const useUser = defineStore("user", {
-  state: () => ({ loading: false, data: { id: "", name: "", shortDescription: "", address: "", category: "", avatar: "", isPublished: false } }),
+export const useUserStore = defineStore("user", {
+  state: () => ({
+    loading: false,
+    data: {
+      id: "",
+      name: "",
+      shortDescription: "",
+      address: "",
+      category: "",
+      avatar: "",
+      isPublished: false,
+      facebook: "",
+      twitter: "",
+      linkedin: "",
+      youtube: "",
+      tiktok: "",
+      instagram: "",
+    },
+  }),
 
   actions: {
     async getUser(address) {
@@ -11,7 +28,7 @@ export const useUser = defineStore("user", {
 
       const user = await moralis.data.getUser(address)
       if (!user) {
-        return // user does not exist
+        throw new Error("User does not exist")
       }
       const { attributes } = user
 
@@ -22,6 +39,12 @@ export const useUser = defineStore("user", {
       this.data.category = attributes.category
       this.data.isPublished = attributes.isPublished
       this.data.avatar = attributes.avatar
+      this.data.facebook = attributes.facebook
+      this.data.twitter = attributes.twitter
+      this.data.tiktok = attributes.tiktok
+      this.data.linkedin = attributes.linkedin
+      this.data.youtube = attributes.youtube
+      this.data.instagram = attributes.instagram
 
       this.loading = false
     },
@@ -49,7 +72,11 @@ export const useUser = defineStore("user", {
     },
 
     async withdrawAsset(data) {
-      await fibril.withdrawAsset(data)
+      if (data.method == "Token") {
+        await fibril.withdrawToken(data)
+      } else {
+        await fibril.withdrawNft(data)
+      }
     },
   },
 })

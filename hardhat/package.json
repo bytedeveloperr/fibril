@@ -3,13 +3,19 @@
   "version": "1.0.0",
   "main": "index.js",
   "license": "MIT",
+  "scripts": {
+    "deploy:fibril": "npx hardhat run --network mumbai scripts/deploy_v1.js",
+    "deploy:feed": "npx hardhat run --network mumbai scripts/deploy_price_feed.js"
+  },
   "dependencies": {
+    "@chainlink/contracts": "^0.4.1",
     "@nomiclabs/hardhat-etherscan": "^3.0.3",
     "@openzeppelin/contracts": "^4.5.0",
     "@openzeppelin/contracts-upgradeable": "^4.5.2",
     "@openzeppelin/hardhat-upgrades": "^1.17.0",
     "hardhat": "^2.9.3",
-    "solidity-coverage": "^0.7.20"
+    "solidity-coverage": "^0.7.20",
+    "web3": "^1.7.3"
   },
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.0",

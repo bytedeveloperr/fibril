@@ -13,7 +13,7 @@ contract FibrilNFT is ERC721, ERC721URIStorage, Ownable {
 
     constructor() ERC721("Fibril", "FBL") {}
 
-    function safeMint(address _to, string memory _tokenURI) public onlyOwner returns(uint256){
+    function safeMint(address _to, string memory _tokenURI) public onlyOwner returns (uint256) {
         _tokenIdCount.increment();
 
         _safeMint(_to, _tokenIdCount.current());
@@ -30,7 +30,7 @@ contract FibrilNFT is ERC721, ERC721URIStorage, Ownable {
         return super.tokenURI(_tokenId);
     }
 
-    function tokenIdCount() public view returns(uint256) {
-      return _tokenIdCount.current();
+    function tokenIdCount() public view returns (uint256) {
+        return _tokenIdCount.current();
     }
 }

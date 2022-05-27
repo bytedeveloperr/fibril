@@ -2,8 +2,8 @@ import { useLocalStorage } from "@vueuse/core"
 import { defineStore } from "pinia"
 import { moralis } from "../helpers/moralis"
 
-export const useAuth = defineStore("auth", {
-  state: () => useLocalStorage("auth", { address: null, provider: null, authenticated: null }),
+export const useAuthStore = defineStore("auth", {
+  state: () => useLocalStorage("auth", { address: null, provider: null, authenticated: null, chainId: null }),
 
   actions: {
     async authenticate(provider, options) {
@@ -11,18 +11,25 @@ export const useAuth = defineStore("auth", {
       this.address = auth.get("ethAddress")
       this.authenticated = true
       this.provider = provider
+      this.chainId = moralis.getChainId()
     },
 
-    async destroy() {
+    destroy() {
       this.address = null
       this.authenticated = null
       this.provider = null
+      this.chainId = null
+    },
+
+    updateChainId() {
+      this.chainId = moralis.getChainId()
     },
 
     async logOut() {
       await moralis.logOut()
       this.address = null
       this.authenticated = false
+      this.chainId = null
     },
   },
 })

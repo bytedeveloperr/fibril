@@ -1,19 +1,16 @@
 import { defineStore } from "pinia"
 import { fibril } from "../helpers/fibril"
 import { util } from "../helpers/util"
-import { useAuth } from "./auth"
+import { useAuthStore } from "./auth"
 
-export const useDashboard = defineStore("dashboard", {
-  state: () => ({ loading: false, auth: {}, balances: [], activities: [] }),
+export const useDashboardStore = defineStore("dashboard", {
+  state: () => ({ loading: false, balances: [], activities: [], supporters: [] }),
 
   actions: {
-    async loadDashboard(address) {
+    async loadDashboard(addr) {
       this.loading = true
-      if (!address) {
-        this.auth = useAuth()
-        address = this.auth.address
-      }
 
+      const address = addr || useAuthStore().address
       if (!util.isEthAddress(address)) {
         throw new Error("Invalid Ethereum address")
       }
@@ -21,43 +18,30 @@ export const useDashboard = defineStore("dashboard", {
       const data = await fibril.getCreatorDashboardData(address)
       this.activities = data.activities
       this.balances = data.balances
+      this.supporters = data.supporters
+
       this.loading = false
     },
 
-    async loadBalances(address) {
-      if (!address) {
-        this.auth = useAuth()
-        address = this.auth.address
-      }
+    async loadBalances(addr) {
+      const address = addr || useAuthStore().address
 
       if (!util.isEthAddress(address)) {
         throw new Error("Invalid Ethereum address")
       }
-
       this.balances = await fibril.getCreatorBalances(address)
     },
 
-    async loadActivities(address) {
-      if (!address) {
-        this.auth = useAuth()
-        address = this.auth.address
-      }
-
-      if (!util.isEthAddress(address)) {
-        throw new Error("Invalid Ethereum address")
-      }
-
-      await fibril.getCreatorActivities(address)
+    async getCreatorActivities() {
+      return await fibril.getCreatorActivities(useAuthStore().address)
     },
 
-    async getNfts() {
-      return await fibril.getNfts()
+    async getCreatorSupporters() {
+      return await fibril.getCreatorSupporters(useAuthStore().address)
     },
 
-    async getNftItem(address, id) {
-      return await fibril.getNftItem(address, id)
+    async getCreatorSupporter(id) {
+      return await fibril.getCreatorSupporter(id)
     },
   },
 })
-
-// 0xCA5Ac6854f937a8971d47393ad246fCCdb66d24d
