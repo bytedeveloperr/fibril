@@ -5,8 +5,8 @@
     <v-col v-else md="6" class="mx-auto">
       <p class="h1">Support {{ userStore.data.name }}</p>
 
-      <v-form @submit.prevent="handleFormSubmit">
-        <v-select placeholder="Select Support Method" v-model="data.method" :items="config.methods" />
+      <v-form @submit.prevent="handleFormSubmit" ref="form">
+        <v-select :rules="rules" placeholder="Select Support Method" v-model="data.method" :items="config.methods" />
 
         <template v-if="data.method == 'Token'">
           <v-select
@@ -15,13 +15,28 @@
             item-text="symbol"
             item-value="address"
             v-model="data.asset"
+            :rules="data.method == 'Token' ? rules : []"
           />
-          <v-text-field placeholder="Enter Amount" v-model="data.amount" />
+          <v-text-field
+            type="number"
+            :rules="data.method == 'Token' ? rules : []"
+            placeholder="Enter Amount"
+            v-model="data.amount"
+          />
         </template>
 
         <template v-else-if="data.method == 'NFT'">
-          <v-text-field placeholder="Enter Contract Address" v-model="data.contract" />
-          <v-text-field placeholder="Enter Token ID" v-model="data.tokenId" />
+          <v-text-field
+            :rules="data.method == 'NFT' ? rules : []"
+            placeholder="Enter Contract Address"
+            v-model="data.contract"
+          />
+          <v-text-field
+            type="number"
+            :rules="data.method == 'NFT' ? rules : []"
+            placeholder="Enter Token ID"
+            v-model="data.tokenId"
+          />
         </template>
 
         <v-btn depressed block rounded :disabled="loaders.submit" type="submit" class="primary">Continue</v-btn>
@@ -42,7 +57,7 @@ import { config } from "@/config/config"
 import { useUserStore } from "@/stores/user"
 import { useAuthStore } from "@/stores/auth"
 import { useToast } from "vue-toastification/composition"
-import { defineComponent, onMounted, reactive } from "@vue/composition-api"
+import { defineComponent, onMounted, reactive, ref } from "@vue/composition-api"
 
 export default defineComponent({
   components: { Loader },
@@ -50,9 +65,11 @@ export default defineComponent({
   setup(_, ctx) {
     const { $route, $router } = ctx.root
 
+    const form = ref(null)
     const toast = useToast()
     const userStore = useUserStore()
     const authStore = useAuthStore()
+    const rules = [(v) => !!v || "This field is required"]
     const loaders = reactive({ submit: false, mount: false })
     const data = reactive({ method: null, amount: null, contract: null, tokenId: null, asset: null })
 
@@ -72,6 +89,8 @@ export default defineComponent({
       loaders.submit = true
 
       try {
+        if (!form.value.validate()) return
+
         if (data.method == "Token") {
           const asset = config.tokens.find((balance) => balance.address == data.asset)
           await userStore.supportCreator({
@@ -95,12 +114,12 @@ export default defineComponent({
         $router.push(`/creator/${$route.params.id}`)
       } catch (e) {
         toast.error(e.data?.message || e.message)
+      } finally {
+        loaders.submit = false
       }
-
-      loaders.submit = false
     }
 
-    return { userStore, config, data, handleFormSubmit, loaders }
+    return { userStore, config, data, handleFormSubmit, loaders, rules, form }
   },
 })
 </script>

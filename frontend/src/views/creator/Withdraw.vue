@@ -5,8 +5,8 @@
     <v-col v-else md="6" class="mx-auto">
       <p class="h1">Withdraw Asset</p>
 
-      <v-form @submit.prevent="handleFormSubmit">
-        <v-select placeholder="Select Support Method" v-model="data.method" :items="config.methods" />
+      <v-form @submit.prevent="handleFormSubmit" ref="form">
+        <v-select :rules="rules" placeholder="Select Support Method" v-model="data.method" :items="config.methods" />
 
         <template v-if="data.method == 'Token'">
           <v-select
@@ -15,16 +15,30 @@
             item-text="symbol"
             item-value="address"
             v-model="data.asset"
+            :rules="data.method == 'Token' ? rules : []"
           />
-          <v-text-field placeholder="Enter Recipient" v-model="data.recipient" />
-          <v-text-field placeholder="Enter Amount" v-model="data.amount" />
+          <v-text-field
+            :rules="data.method == 'Token' ? rules : []"
+            type="number"
+            placeholder="Enter Amount"
+            v-model="data.amount"
+          />
         </template>
 
         <template v-else-if="data.method == 'NFT'">
-          <v-text-field placeholder="Enter Contract Address" v-model="data.nftAddress" />
-          <v-text-field placeholder="Enter Token ID" v-model="data.tokenId" />
-          <v-text-field placeholder="Enter Recipient" v-model="data.recipient" />
+          <v-text-field
+            :rules="data.method == 'NFT' ? rules : []"
+            placeholder="Enter Contract Address"
+            v-model="data.nftAddress"
+          />
+          <v-text-field
+            :rules="data.method == 'NFT' ? rules : []"
+            type="number"
+            placeholder="Enter Token ID"
+            v-model="data.tokenId"
+          />
         </template>
+        <v-text-field :rules="rules" placeholder="Enter Recipient" v-model="data.recipient" />
 
         <v-btn depressed block rounded :disabled="loaders.submit" type="submit" class="primary">Continue</v-btn>
       </v-form>
@@ -39,7 +53,7 @@
 </style>
 
 <script>
-import { defineComponent, onMounted, reactive } from "@vue/composition-api"
+import { defineComponent, onMounted, reactive, ref } from "@vue/composition-api"
 import { useUserStore } from "@/stores/user"
 import { useAuthStore } from "@/stores/auth"
 import { useToast } from "vue-toastification/composition"
@@ -50,10 +64,13 @@ export default defineComponent({
   components: { Loader },
 
   setup() {
+    const form = ref(null)
+    const toast = useToast()
     const userStore = useUserStore()
     const authStore = useAuthStore()
-    const toast = useToast()
     const loaders = reactive({ mount: false, submit: false })
+    const rules = [(v) => !!v || "This field is required"]
+
     const data = reactive({
       method: null,
       amount: null,
@@ -79,6 +96,8 @@ export default defineComponent({
       loaders.submit = true
 
       try {
+        if (!form.value.validate()) return
+
         if (data.method == "Token") {
           const asset = config.tokens.find((balance) => balance.address == data.asset)
           await userStore.withdrawAsset({
@@ -88,7 +107,7 @@ export default defineComponent({
             recipient: data.recipient,
             creator: userStore.data.address,
           })
-        } else {
+        } else if (data.method == "NFT") {
           await userStore.withdrawAsset({
             method: data.method,
             tokenId: data.tokenId,
@@ -101,12 +120,12 @@ export default defineComponent({
         toast.success("Withdrawal is successful")
       } catch (e) {
         toast.error(e.data?.message || e.message)
+      } finally {
+        loaders.submit = false
       }
-
-      loaders.submit = false
     }
 
-    return { userStore, authStore, config, data, handleFormSubmit, loaders }
+    return { userStore, authStore, config, data, handleFormSubmit, loaders, form, rules }
   },
 })
 </script>

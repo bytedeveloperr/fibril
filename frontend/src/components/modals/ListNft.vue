@@ -7,16 +7,17 @@
           <v-btn icon @click="toggleListingModal"><v-icon>mdi-close</v-icon></v-btn>
         </div>
 
-        <v-form @submit.prevent="handleFormSubmit">
+        <v-form @submit.prevent="handleFormSubmit" ref="form">
           <v-select
             label="Select Asset"
             :items="config.tokens"
             item-text="symbol"
             item-value="address"
             v-model="data.asset"
+            :rules="rules"
           />
 
-          <v-text-field placeholder="Enter Amount" v-model="data.amount" />
+          <v-text-field type="number" placeholder="Enter Amount" v-model="data.amount" :rules="rules" />
           <v-btn type="submit" :disabled="loaders.submit" depressed block class="black white--text">Submit</v-btn>
         </v-form>
       </v-card-text>
@@ -25,7 +26,7 @@
 </template>
 
 <script>
-import { defineComponent, inject, reactive } from "@vue/composition-api"
+import { defineComponent, inject, reactive, ref } from "@vue/composition-api"
 import { util } from "@/helpers/util"
 import { config } from "@/config/config"
 import { useNftStore } from "@/stores/nft"
@@ -36,6 +37,7 @@ export default defineComponent({
   props: ["address", "tokenId"],
 
   setup(props) {
+    const form = ref(null)
     const nftStore = useNftStore()
     const authStore = useAuthStore()
     const show = inject("showListingModal")
@@ -43,11 +45,14 @@ export default defineComponent({
     const data = reactive({ amount: "", asset: null })
     const loaders = reactive({ submit: false })
     const toast = useToast()
+    const rules = [(v) => !!v || "This field is required"]
 
     async function handleFormSubmit() {
       loaders.submit = true
 
       try {
+        if (!form.value.validate()) return
+
         const asset = config.tokens.find((token) => token.address == data.asset)
         await nftStore.listNft({
           asset: asset,
@@ -61,12 +66,12 @@ export default defineComponent({
         toast.success("NFT listed successfully")
       } catch (e) {
         toast.error(e.message)
+      } finally {
+        loaders.submit = false
       }
-
-      loaders.submit = false
     }
 
-    return { nftStore, authStore, config, show, util, toggleListingModal, data, handleFormSubmit, loaders }
+    return { nftStore, authStore, config, show, util, toggleListingModal, data, handleFormSubmit, loaders, rules, form }
   },
 })
 </script>

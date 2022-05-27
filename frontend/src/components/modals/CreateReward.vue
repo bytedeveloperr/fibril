@@ -7,16 +7,22 @@
           <v-btn icon @click="toggleCreateRewardModal"><v-icon>mdi-close</v-icon></v-btn>
         </div>
 
-        <v-form @submit.prevent="handleFormSubmit">
+        <v-form @submit.prevent="handleFormSubmit" ref="form">
           <v-select
             label="Select Asset"
             :items="config.tokens"
             item-text="symbol"
             item-value="address"
             v-model="data.asset"
+            :rules="rules"
           />
-          <v-text-field placeholder="Enter amount per winner" v-model="data.amount" />
-          <v-text-field placeholder="Enter amount of possible winners" v-model="data.winners" />
+          <v-text-field type="number" placeholder="Enter amount per winner" v-model="data.amount" :rules="rules" />
+          <v-text-field
+            type="number"
+            placeholder="Enter amount of possible winners"
+            v-model="data.winners"
+            :rules="rules"
+          />
 
           <v-btn depressed block dark :disabled="loaders.submit" type="submit">Continue</v-btn>
         </v-form>
@@ -26,7 +32,7 @@
 </template>
 
 <script>
-import { defineComponent, inject, reactive } from "@vue/composition-api"
+import { defineComponent, inject, reactive, ref } from "@vue/composition-api"
 import { util } from "@/helpers/util"
 import { config } from "@/config/config"
 import { useRewardStore } from "@/stores/reward"
@@ -35,6 +41,7 @@ import { useToast } from "vue-toastification/composition"
 
 export default defineComponent({
   setup(_, ctx) {
+    const form = ref(null)
     const toast = useToast()
     const { $router } = ctx.root
     const authStore = useAuthStore()
@@ -43,11 +50,14 @@ export default defineComponent({
     const show = inject("showCreateRewardModal")
     const toggleCreateRewardModal = inject("toggleCreateRewardModal")
     const data = reactive({ amount: "", asset: null, winners: "" })
+    const rules = [(v) => !!v || "This field is required"]
 
     async function handleFormSubmit() {
       loaders.submit = true
 
       try {
+        if (!form.value.validate()) return
+
         const asset = config.tokens.find((balance) => balance.address == data.asset)
         await rewardStore.rewardRandomSupporters({
           asset: asset,
@@ -60,12 +70,12 @@ export default defineComponent({
         $router.push(`/dashboard`)
       } catch (e) {
         toast.error(e.data?.message || e.message)
+      } finally {
+        loaders.submit = false
       }
-
-      loaders.submit = false
     }
 
-    return { authStore, config, show, util, toggleCreateRewardModal, data, handleFormSubmit, loaders }
+    return { authStore, config, show, util, toggleCreateRewardModal, data, handleFormSubmit, loaders, form, rules }
   },
 })
 </script>

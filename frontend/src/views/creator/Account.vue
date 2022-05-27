@@ -29,33 +29,36 @@
             <input type="file" id="image" class="d-none" @change="handleFileUpload" />
           </div>
 
-          <v-form @submit.prevent="handleFormSubmit">
+          <v-form @submit.prevent="handleFormSubmit" ref="form1">
             <v-text-field
               type="text"
               placeholder="Creator's Name"
               :value="userStore.name"
               v-model="userStore.data.name"
+              :rules="rules"
             />
             <v-select
               placeholder="Category"
-              :items="config.categories"
+              :items="config.filters.creators"
               item-value="slug"
               item-text="title"
               :value="userStore.data.category"
               v-model="userStore.data.category"
+              :rules="rules"
             />
             <v-text-field
               type="text"
               placeholder="Short Description"
               :value="userStore.data.shortDescription"
               v-model="userStore.data.shortDescription"
+              :rules="rules"
             />
             <v-textarea
               placeholder="Long Description"
               :value="userStore.data.longDescription"
               v-model="userStore.data.longDescription"
             />
-            <v-switch v-model="userStore.data.isPublished" inset label="Publish creator"></v-switch>
+            <v-switch :rules="rules" v-model="userStore.data.isPublished" inset label="Publish creator"></v-switch>
 
             <v-btn block depressed rounded :disabled="loaders.update" type="submit" class="primary mt-3">
               Save Details
@@ -142,10 +145,12 @@ import { config } from "@/config/config"
 export default defineComponent({
   components: { Loader },
   setup() {
-    const userStore = useUserStore()
-    const loaders = reactive({ mount: false, upload: false, update: false })
-    const toast = useToast()
     const tab = ref(null)
+    const form1 = ref(null)
+    const toast = useToast()
+    const userStore = useUserStore()
+    const rules = [(v) => !!v || "This field is required"]
+    const loaders = reactive({ mount: false, upload: false, update: false })
 
     onMounted(async () => {
       loaders.mount = true
@@ -159,13 +164,17 @@ export default defineComponent({
 
     async function handleFormSubmit() {
       loaders.update = true
+
       try {
+        if (!form1.value.validate()) return
+
         await userStore.updateUser()
         toast.success("Account details updated successfully")
       } catch (e) {
         toast.error(e.message)
+      } finally {
+        loaders.update = false
       }
-      loaders.update = false
     }
 
     async function handleFileUpload(e) {
@@ -185,7 +194,7 @@ export default defineComponent({
 
       loaders.upload = false
     }
-    return { loaders, userStore, tab, config, handleFormSubmit, handleFileUpload }
+    return { loaders, userStore, tab, config, handleFormSubmit, handleFileUpload, form1, rules }
   },
 })
 </script>
