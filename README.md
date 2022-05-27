@@ -11,12 +11,16 @@ The current and most popular creator support platforms are centralized and not c
 Also, Some of these platforms are not available in some regions and countries which leaves the creators in those regions/countries at a disadvantage.
 
 ### Solution
+The solution built is a decentralized creator support platform.
 
 Fibril is a decentralized creator support platform that allows fans (A.K.A supporters) to support their favorite creators and idols with crypto tokens and NFTs.
 
 Creators and Supporters can access the platform from any region/country in the world without any fear of account suspension or deplatforming because the core and main features of the platform are smart contracts written and deployed to the blockchain network.
 
 Creators can be supported with crypto tokens which are MATIC, DAI, USDT and USDC. They can also be supported with NFTs.
+
+Support with the crypto tokens makes it very easy for supporters to support their creators across border without the hassle of converting their local currencies into that of the creators.
+Also, Using crypto tokens makes it easy for creators to withdraw their funds and convert it back to their local currencies with great ease in any exchange.
 
 Some of the current features of Fibril:
 
@@ -36,12 +40,12 @@ Some of the current features of Fibril:
 - Solidity - The smart contracts is written in solidity
 - Vue.js - The frontend is built with Vue.js
 - Moralis - Moralis powers the connection of user's wallet, interacting with smart contracts, database and lot more.
-- The Graph Protocol - The graph protocol is used to index the smart contract data
-- Alchemy - Alchemy powers the NFTs data and metadata retreival
-- IPFS (web3.storage and nft.storage) - IPFS is used to store creators profile images and support links JSON
+- The Graph Protocol - The graph protocol is used to index the data of our smart contracts
+- Alchemy - Alchemy powers the Fibril's NFTs data and metadata retreival
+- IPFS (web3.storage) - IPFS is used to store creators profile images and support links JSON
 - Chainlink - Powers the tokens price smart contract and Random number generation
 - Polygon - The smart contracts are deployed to Polygon Mumbai
 
 ### Deployments
 
-The smart contract is being deployed to Polygon Mumbai Network
+The smart contract is deployed to Polygon Mumbai Network
