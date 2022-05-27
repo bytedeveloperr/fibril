@@ -11,3 +11,4 @@ artifacts
 .vscode
 .openzeppelin
 .t.sol
+.mint.js

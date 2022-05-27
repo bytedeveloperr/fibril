@@ -3,6 +3,8 @@ require("@openzeppelin/hardhat-upgrades")
 require("@nomiclabs/hardhat-etherscan")
 require("solidity-coverage")
 
+require("dotenv").config();
+
 // This is a sample Hardhat task. To learn how to create your own go to
 // https://hardhat.org/guides/create-task.html
 task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
@@ -24,7 +26,7 @@ module.exports = {
   networks: {
     mumbai: {
       url: "https://matic-mumbai.chainstacklabs.com",
-      accounts: ["39c16e02ed1cf0b311aab5967d9e972535a7fd6c98b4a2914df723f1cb25900b", "3ec2a4a3e3836c16edb20b6613a9dcb994934d4e03e6ea17c7428eb67002a680"],
+      accounts: [process.env.PK_1, process.env.PK_2],
       gas: 5000000,
     },
   },
