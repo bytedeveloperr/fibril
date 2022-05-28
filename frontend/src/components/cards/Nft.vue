@@ -29,17 +29,29 @@
       </template>
 
       <template v-else>
-        <v-btn
-          depressed
-          link
-          block
-          class="primary--text"
-          :disabled="loaders.buy"
-          v-if="(item.sale && item.sale.status) === 'Active'"
-          @click="buyNftItem"
-        >
-          Buy for {{ item.sale && item.sale.pricePerItem }} {{ item.sale && item.sale.paymentToken.symbol }}
-        </v-btn>
+        <template v-if="(item.sale && item.sale.status) === 'Active'">
+          <v-btn
+            depressed
+            link
+            block
+            class="primary--text"
+            :disabled="loaders.buy"
+            v-if="authStore.authenticated"
+            @click="buyNftItem"
+          >
+            Buy for {{ item.sale && item.sale.pricePerItem }} {{ item.sale && item.sale.paymentToken.symbol }}
+          </v-btn>
+          <v-btn
+            depressed
+            link
+            block
+            class="primary--text"
+            :to="`/connect?next=/nft/${item.address}:${item.tokenId}`"
+            v-else
+          >
+            Connect wallet to buy
+          </v-btn>
+        </template>
 
         <v-btn depressed block disabled class="primary--text" v-else>NFT is not for sale</v-btn>
       </template>

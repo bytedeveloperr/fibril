@@ -37,7 +37,7 @@
           <v-row>
             <Empty v-if="nftStore.nfts.length < 1" text="Creator does not have any NFT" />
             <v-col v-for="(item, i) in nftStore.nfts" :key="'nft-' + i" md="5" cols="12">
-              <NftCard :item="item" :authStore="authStore" :dashboardStore="dashboardStore" />
+              <NftCard :item="item" :authStore="authStore" :nftStore="nftStore" />
             </v-col>
           </v-row>
         </template>
