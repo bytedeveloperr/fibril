@@ -58,7 +58,7 @@
               :value="userStore.data.longDescription"
               v-model="userStore.data.longDescription"
             />
-            <v-switch :rules="rules" v-model="userStore.data.isPublished" inset label="Publish creator"></v-switch>
+            <v-switch v-model="userStore.data.isPublished" inset label="Publish creator"></v-switch>
 
             <v-btn block depressed rounded :disabled="loaders.update" type="submit" class="primary mt-3">
               Save Details
