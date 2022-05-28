@@ -99,7 +99,7 @@ import { config } from "@/config/config"
 import { environment } from "@/config/environment"
 
 export default defineComponent({
-  setup() {
+  setup(_, ctx) {
     const authStore = useAuthStore()
     const drawer = ref(null)
     const items = reactive([
@@ -125,6 +125,7 @@ export default defineComponent({
 
     async function logOut() {
       await authStore.logOut()
+      ctx.$router.push("/connect")
     }
 
     return { drawer, util, items, authStore, logOut, config, environment }

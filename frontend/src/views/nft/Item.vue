@@ -9,7 +9,12 @@
       <v-col md="6" cols="12">
         <div class="d-flex justify-space-between">
           <p class="h1 font-weight-bold mb-5">{{ nftStore.nft.metadata && nftStore.nft.metadata.name }}</p>
-          <template v-if="(nftStore.nft.owner && nftStore.nft.owner.toLowerCase()) === authStore.address.toLowerCase()">
+          <template
+            v-if="
+              (nftStore.nft.owner && nftStore.nft.owner.toLowerCase()) ===
+              (authStore.address && authStore.address.toLowerCase())
+            "
+          >
             <v-btn
               depressed
               class="mb-5 primary--text"

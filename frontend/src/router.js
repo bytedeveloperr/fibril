@@ -17,33 +17,65 @@ import NftItem from "@/views/nft/Item.vue"
 import SupportLinks from "@/views/links/List.vue"
 import ShowSupportLink from "@/views/links/Show.vue"
 
-Vue.use(VueRouter)
+import { useAuthStore } from "./stores/auth"
 
 const routes = [
   { path: "/", name: "Home", component: Home },
-  { path: "/dashboard", name: "Dashboard", component: Dashboard },
-  { path: "/connect", name: "Connect", component: Connect },
-  { path: "/discover/:entity", name: "Discover", component: Discover },
-  { path: "/account", name: "CreatorAccount", component: CreatorAccount },
-  { path: "/withdraw", name: "WithdrawAsset", component: WithdrawAsset },
+  { path: "/connect", name: "Connect", component: Connect, meta: { ensureGuest: true } },
+
+  { path: "/dashboard", name: "Dashboard", component: Dashboard, meta: { ensureAuth: true } },
+  { path: "/withdraw", name: "WithdrawAsset", component: WithdrawAsset, meta: { ensureAuth: true } },
+  { path: "/account", name: "CreatorAccount", component: CreatorAccount, meta: { ensureAuth: true } },
+  { path: "/links", name: "SupportLinks", component: SupportLinks, meta: { ensureAuth: true } },
+  { path: "/activities", name: "CreatorActivities", component: CreatorActivities, meta: { ensureAuth: true } },
+  { path: "/supporters", name: "CreatorSupporters", component: CreatorSupporters, meta: { ensureAuth: true } },
+
   { path: "/nfts", name: "NftDashBoard", component: NftDashBoard },
-  { path: "/creator/:id", name: "ShowCreator", component: ShowCreator },
-  {
-    path: "/creator/:id/support",
-    name: "SupportCreator",
-    component: SupportCreator,
-  },
   { path: "/nft/:id", name: "NftItem", component: NftItem },
-  { path: "/links", name: "SupportLinks", component: SupportLinks },
+
+  { path: "/discover/:entity", name: "Discover", component: Discover },
+
+  { path: "/creator/:id", name: "ShowCreator", component: ShowCreator },
+  { path: "/creator/:id/support", name: "SupportCreator", component: SupportCreator, meta: { ensureAuth: true } },
+
   { path: "/support/:cid", name: "ShowSupportLink", component: ShowSupportLink },
-  { path: "/activities", name: "CreatorActivities", component: CreatorActivities },
-  { path: "/supporters", name: "CreatorSupporters", component: CreatorSupporters },
-  { path: "/supporter/:id", name: "ShowSupporter", component: ShowSupporter },
-  { path: "/actions/reward", name: "RewardSupporters", component: RewardSupporters },
+  { path: "/supporter/:id", name: "ShowSupporter", component: ShowSupporter, meta: { ensureAuth: true } },
+  { path: "/actions/reward", name: "RewardSupporters", component: RewardSupporters, meta: { ensureAuth: true } },
 ]
 
-export const router = new VueRouter({
-  mode: "history",
-  base: process.env.BASE_URL,
-  routes,
-})
+export function router() {
+  Vue.use(VueRouter)
+
+  const router = new VueRouter({
+    mode: "history",
+    base: process.env.BASE_URL,
+    routes,
+  })
+
+  router.beforeEach((to, from, next) => {
+    if (to.meta.ensureAuth) {
+      console.log("guarded...")
+      if (!useAuthStore().authenticated) {
+        console.log("not auth")
+        return next(`/connect?next=${to.fullPath}`)
+      }
+
+      console.log("has auth")
+      return next()
+    } else if (to.meta.ensureGuest) {
+      console.log("guest...")
+      if (useAuthStore().authenticated) {
+        console.log("has auth")
+        return next("/dashboard")
+      }
+
+      console.log("not auth")
+      return next()
+    } else {
+      console.log("neutral")
+      return next()
+    }
+  })
+
+  return router
+}

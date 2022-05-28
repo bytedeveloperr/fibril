@@ -11,7 +11,9 @@
         </router-link>
       </div>
 
-      <template v-if="(item.owner && item.owner.toLowerCase()) === authStore.address.toLowerCase()">
+      <template
+        v-if="(item.owner && item.owner.toLowerCase()) === (authStore.address && authStore.address.toLowerCase())"
+      >
         <v-btn
           depressed
           block

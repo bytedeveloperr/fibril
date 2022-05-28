@@ -41,7 +41,7 @@ export default defineComponent({
 
     watch(
       () => authStore.address,
-      () => console.log(ctx.root.$router)
+      () => ctx.root.$router.push("/dashboard")
     )
 
     return { partialRoutes }

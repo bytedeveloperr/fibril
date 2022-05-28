@@ -24,12 +24,12 @@
 
 <script>
 import { defineComponent } from "@vue/composition-api"
-import { router } from "../router"
 import { useAuthStore } from "@/stores/auth"
 import { useToast } from "vue-toastification/composition"
 
 export default defineComponent({
-  setup() {
+  setup(_, ctx) {
+    const { $router, $route } = ctx.root
     const toast = useToast()
     const authStore = useAuthStore()
 
@@ -41,7 +41,7 @@ export default defineComponent({
     async function authenticate(provider) {
       try {
         await authStore.authenticate(provider)
-        router.push("/dashboard")
+        $router.push($route.query.next || "/dashboard")
       } catch (e) {
         toast.error(e.message)
       }
