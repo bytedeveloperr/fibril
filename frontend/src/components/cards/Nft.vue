@@ -1,5 +1,5 @@
 <template>
-  <v-card flat outlined height="420">
+  <v-card flat outlined height="425">
     <router-link :to="`/nft/${item.address}:${item.tokenId}`">
       <v-img :src="(item.metadata && item.metadata.image) || '/assets/images/not-found.png'" height="300" />
     </router-link>
@@ -9,13 +9,6 @@
         <router-link :to="`/nft/${item.address}:${item.tokenId}`">
           <p class="h4 py-1 font-weight-bold">{{ item.metadata && item.metadata.name }}</p>
         </router-link>
-        <p class="h4">
-          <v-btn icon shaped link class="pa-1">
-            <v-icon>mdi-heart-outline</v-icon>
-          </v-btn>
-
-          <span>3</span>
-        </p>
       </div>
 
       <template v-if="(item.owner && item.owner.toLowerCase()) === authStore.address.toLowerCase()">

@@ -110,7 +110,7 @@ export default defineComponent({
       {
         title: "Actions",
         icon: "mdi-chemical-weapon",
-        children: [{ title: "Award Supporters", icon: "mdi-trophy-award", path: "/actions/award" }],
+        children: [{ title: "Reward", icon: "mdi-trophy-award", path: "/actions/reward" }],
       },
       { divider: true },
       {

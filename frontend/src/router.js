@@ -39,7 +39,7 @@ const routes = [
   { path: "/activities", name: "CreatorActivities", component: CreatorActivities },
   { path: "/supporters", name: "CreatorSupporters", component: CreatorSupporters },
   { path: "/supporter/:id", name: "ShowSupporter", component: ShowSupporter },
-  { path: "/actions/award", name: "RewardSupporters", component: RewardSupporters },
+  { path: "/actions/reward", name: "RewardSupporters", component: RewardSupporters },
 ]
 
 export const router = new VueRouter({
