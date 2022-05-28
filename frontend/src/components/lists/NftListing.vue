@@ -6,9 +6,18 @@
         <v-list-item :key="'listing-' + i" class="pa-0">
           <v-list-item-content>
             <v-list-item-title class="mb-2">
-              Listed by <b>{{ util.truncateEthAddress(listing.listedBy) }}</b>
+              Listed by
+              <v-btn
+                text
+                link
+                class="primary--text"
+                target="_blank"
+                :href="`${environment.explorerUrl}/address/${listing.listedBy}`"
+              >
+                {{ util.truncateEthAddress(listing.listedBy) }}
+              </v-btn>
             </v-list-item-title>
-            <v-list-item-subtitle>24 May 2022, 10:44 AM</v-list-item-subtitle>
+            <v-list-item-subtitle>{{ util.formatDate(listing.listedAt * 1000) }}</v-list-item-subtitle>
           </v-list-item-content>
           <v-list-item-action>
             <v-list-item-title class="mb-2">
@@ -27,6 +36,7 @@ import { defineComponent } from "@vue/composition-api"
 import Empty from "@/components/Empty"
 import { useAuthStore } from "@/stores/auth"
 import { util } from "@/helpers/util"
+import { environment } from "@/config/environment"
 
 export default defineComponent({
   props: ["listings"],
@@ -34,7 +44,7 @@ export default defineComponent({
   setup() {
     const authStore = useAuthStore()
 
-    return { authStore, util }
+    return { authStore, util, environment }
   },
 })
 </script>

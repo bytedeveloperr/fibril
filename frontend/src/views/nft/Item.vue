@@ -83,7 +83,15 @@
             <ul class="style-none pa-0">
               <li class="d-flex justify-space-between">
                 <span>Contract Address:</span>
-                <v-btn text link class="primary--text">{{ util.truncateEthAddress(nftStore.nft.address) }}</v-btn>
+                <v-btn
+                  text
+                  link
+                  class="primary--text"
+                  target="_blank"
+                  :href="`${environment.explorerUrl}/token/${nftStore.nft.address}`"
+                >
+                  {{ util.truncateEthAddress(nftStore.nft.address) }}
+                </v-btn>
               </li>
               <v-divider class="mb-3" />
 
@@ -95,7 +103,15 @@
 
               <li class="d-flex justify-space-between">
                 <span>Owner:</span>
-                <v-btn text link class="primary--text">{{ util.truncateEthAddress(nftStore.nft.owner) }}</v-btn>
+                <v-btn
+                  text
+                  link
+                  class="primary--text"
+                  target="_blank"
+                  :href="`${environment.explorerUrl}/address/${nftStore.nft.owner}`"
+                >
+                  {{ util.truncateEthAddress(nftStore.nft.owner) }}
+                </v-btn>
               </li>
               <v-divider class="mb-3" />
             </ul>
@@ -130,6 +146,7 @@ import Loader from "@/components/Loader"
 import ListNftModal from "@/components/modals/ListNft"
 import NftListingList from "@/components/lists/NftListing"
 import { useToast } from "vue-toastification/composition"
+import { environment } from "@/config/environment"
 
 export default defineComponent({
   components: { ListNftModal, NftListingList, Empty, Loader },
@@ -202,6 +219,7 @@ export default defineComponent({
       toggleListingModal,
       authStore,
       nftStore,
+      environment,
     }
   },
 })

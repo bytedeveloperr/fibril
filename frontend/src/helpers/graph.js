@@ -179,6 +179,7 @@ export const graph = {
           address
           paymentToken
           listedBy
+          listedAt
           pricePerItem
           tokenId
           status
