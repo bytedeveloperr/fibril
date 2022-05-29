@@ -99,7 +99,6 @@ export const fibril = {
   },
 
   async supportCreator(data) {
-    const amountInDecimals = data.amount * Math.pow(10, data.asset?.decimals)
     const supportOptions = {
       contractAddress: environment.fibrilContractAddress,
       abi: fibrilABI,
@@ -108,7 +107,7 @@ export const fibril = {
 
     if (data.asset?.address?.toLowerCase() == environment.nullAddress.toLowerCase()) {
       supportOptions.functionName = "supportWithETH"
-      supportOptions.msgValue = amountInDecimals
+      supportOptions.msgValue = moralis.toUnit({ value: data.amount })
     } else {
       const allowance = await moralis.runContractFunction({
         address: data.asset?.address,
@@ -120,14 +119,14 @@ export const fibril = {
         },
       })
 
-      if (allowance < amountInDecimals) {
+      if (allowance < moralis.toUnit({ value: data.amount, type: "Token", decimals: data.asset?.decimals })) {
         const approveOptions = {
           contractAddress: data.asset?.address,
           functionName: "approve",
           abi: ERC20ABI,
           params: {
             _spender: environment.fibrilContractAddress,
-            _value: String(amountInDecimals),
+            _value: moralis.toUnit({ value: data.amount, type: "Token", decimals: data.asset?.decimals }),
           },
         }
         const approveTx = await moralis.executeContract(approveOptions)
@@ -136,7 +135,11 @@ export const fibril = {
 
       supportOptions.contractAddress = environment.fibrilContractAddress
       supportOptions.functionName = "support"
-      supportOptions.params._amount = String(amountInDecimals)
+      supportOptions.params._amount = moralis.toUnit({
+        value: data.amount,
+        type: "Token",
+        decimals: data.asset?.decimals,
+      })
       supportOptions.params._token = data.asset?.address
     }
 
@@ -194,7 +197,6 @@ export const fibril = {
   },
 
   async listNft(data) {
-    const amountInDecimals = data.amount * Math.pow(10, data.asset?.decimals)
     const listOptions = {
       contractAddress: environment.fibrilContractAddress,
       abi: fibrilABI,
@@ -203,7 +205,7 @@ export const fibril = {
         _nftAddress: data.address,
         _tokenId: data.tokenId,
         _paymentToken: data.asset?.address,
-        _pricePerItem: String(amountInDecimals),
+        _pricePerItem: moralis.toUnit({ value: data.amount, type: "Token", decimals: data.asset?.decimals }),
       },
     }
 
@@ -227,8 +229,6 @@ export const fibril = {
   },
 
   async buyNftItem(data) {
-    const amountInDecimals = String(data.amount * Math.pow(10, data.paymentToken.decimals))
-
     if (data.paymentToken.address.toLowerCase() !== environment.nullAddress.toLowerCase()) {
       const allowance = await moralis.runContractFunction({
         address: data.paymentToken.address,
@@ -240,14 +240,14 @@ export const fibril = {
         },
       })
 
-      if (allowance < amountInDecimals) {
+      if (allowance < moralis.toUnit({ value: data.amount, type: "Token", decimals: data.asset.decimals })) {
         const approveOptions = {
           contractAddress: data.paymentToken.address,
           functionName: "approve",
           abi: ERC20ABI,
           params: {
             _spender: environment.fibrilContractAddress,
-            _value: amountInDecimals,
+            _value: moralis.toUnit({ value: data.amount, type: "Token", decimals: data.asset.decimals }),
           },
         }
 
@@ -260,13 +260,13 @@ export const fibril = {
       contractAddress: environment.fibrilContractAddress,
       abi: fibrilABI,
       functionName: "buyItem",
-      msgValue: amountInDecimals,
+      msgValue: moralis.toUnit({ value: data.amount }),
       params: {
         _nftAddress: data.address,
         _tokenId: data.tokenId,
         _creator: data.creator,
         _paymentToken: data.paymentToken.address,
-        _amount: amountInDecimals,
+        _amount: moralis.toUnit({ value: data.amount, type: "Token", decimals: data.asset.decimals }),
       },
     }
 
@@ -275,15 +275,13 @@ export const fibril = {
   },
 
   async withdrawToken(data) {
-    const amountInDecimals = data.amount * Math.pow(10, data.asset?.decimals)
-
     const withdrawOptions = {
       contractAddress: environment.fibrilContractAddress,
       abi: fibrilABI,
       params: {
-        _token: data.asset.address,
+        _token: data.asset?.address,
         _recipient: data.recipient,
-        _amount: String(amountInDecimals),
+        _amount: moralis.toUnit({ value: data.amount, type: "Token", decimals: data.asset?.decimals }),
       },
       functionName: "withdraw",
     }
@@ -309,15 +307,13 @@ export const fibril = {
   },
 
   async rewardRandomSupporters(data) {
-    const amountInDecimals = data.amount * Math.pow(10, data.asset?.decimals)
-
     const withdrawOptions = {
       contractAddress: environment.fibrilContractAddress,
       abi: fibrilABI,
       params: {
         _winnersCount: data.winners,
-        _token: data.asset.address,
-        _amountPerWinner: String(amountInDecimals),
+        _token: data.asset?.address,
+        _amountPerWinner: moralis.toUnit({ value: data.amount, type: "Token", decimals: data.asset?.decimals }),
       },
       functionName: "rewardRandomSupporters",
     }

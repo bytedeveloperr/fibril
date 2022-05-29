@@ -25,9 +25,6 @@ export const moralis = {
     Moralis.start({ serverUrl, appId })
 
     await Moralis.enableWeb3()
-
-    // const chainId = await web3..getChainId()
-    // console.log(chainId)
   },
 
   async authenticate(provider, options = {}) {
@@ -49,6 +46,10 @@ export const moralis = {
 
   async logOut() {
     return Moralis.User.logOut()
+  },
+
+  toUnit({ value, type = "ETH", decimals } = {}) {
+    return Moralis.Units[type](value, decimals)
   },
 
   async getTokenMetadata(addresses, chain = "mumbai") {

@@ -41,16 +41,18 @@
           >
             Buy for {{ item.sale && item.sale.pricePerItem }} {{ item.sale && item.sale.paymentToken.symbol }}
           </v-btn>
-          <v-btn
-            depressed
-            link
-            block
-            class="primary--text"
-            :to="`/connect?next=/nft/${item.address}:${item.tokenId}`"
-            v-else
-          >
-            Connect wallet to buy
-          </v-btn>
+
+          <template v-else>
+            <v-btn
+              depressed
+              link
+              block
+              class="primary--text"
+              :to="`/connect?next=/nft/${item.address}:${item.tokenId}`"
+            >
+              Connect wallet to buy
+            </v-btn>
+          </template>
         </template>
 
         <v-btn depressed block disabled class="primary--text" v-else>NFT is not for sale</v-btn>
