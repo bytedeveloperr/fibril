@@ -14,11 +14,7 @@ contract RandomWordsGenerator is Ownable, VRFConsumerBaseV2 {
     uint16 requestConfirmations = 3;
     Fibril _fibril;
 
-    constructor(
-        address _vrfCoordinator,
-        bytes32 _keyHash,
-        uint64 _subscriptionId
-    ) VRFConsumerBaseV2(_vrfCoordinator) {
+    constructor(address _vrfCoordinator, bytes32 _keyHash, uint64 _subscriptionId) VRFConsumerBaseV2(_vrfCoordinator) {
         keyHash = _keyHash;
         subscriptionId = _subscriptionId;
         vrfCoordinator = VRFCoordinatorV2Interface(_vrfCoordinator);

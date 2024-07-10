@@ -19,6 +19,7 @@ contract Fibril is Initializable, IERC721Receiver {
     mapping(address => mapping(address => uint256)) private _balances;
     mapping(address => mapping(address => mapping(uint256 => Nft))) private _nfts;
     mapping(address => mapping(address => mapping(address => uint256))) private _supports;
+    mapping(address => uint256) private _rewardRequestIds;
     mapping(uint256 => Reward) private _rewards;
 
     Counters.Counter private _creatorCount;
@@ -30,11 +31,13 @@ contract Fibril is Initializable, IERC721Receiver {
         address supporter;
         uint256 tokenId;
     }
+
     struct Creator {
         address addr;
         uint256 id;
         uint256 supportersCount;
     }
+
     struct Reward {
         address creator;
         address token;
@@ -85,15 +88,11 @@ contract Fibril is Initializable, IERC721Receiver {
         require(_creators[_creator].addr == address(0), "Fibril: Creator already exist");
 
         _creatorCount.increment();
-        _creators[_creator] = Creator(msg.sender, _creatorCount.current(), 0);
+        _creators[_creator] = Creator(_creator, _creatorCount.current(), 0);
         emit CreatorCreated(_creatorCount.current(), _creator);
     }
 
-    function support(
-        address _creator,
-        address _token,
-        uint256 _amount
-    ) public {
+    function support(address _creator, address _token, uint256 _amount) public {
         require(_creator != address(0), "Fibril: Creator cannot be the zero address");
         require(_token != address(0), "Fibril: Token address cannot be the zero address");
         require(_amount >= 0, "Fibril: Amount cannot be zero or less");
@@ -128,11 +127,7 @@ contract Fibril is Initializable, IERC721Receiver {
         emit Support(_creator, msg.sender, NULL_ADDRESS, "ERC20", 0, msg.value);
     }
 
-    function supportWithNFT(
-        address _creator,
-        address _nftAddress,
-        uint256 _tokenId
-    ) public payable {
+    function supportWithNFT(address _creator, address _nftAddress, uint256 _tokenId) public payable {
         require(_creator != address(0), "Fibril: Creator address cannot be the zero address");
         require(_creator != address(0), "Fibril: NFT address cannot be the zero address");
 
@@ -146,11 +141,7 @@ contract Fibril is Initializable, IERC721Receiver {
         emit Support(_creator, msg.sender, _nftAddress, "ERC721", _tokenId, 1);
     }
 
-    function withdrawNFT(
-        address _recipient,
-        address _nftAddress,
-        uint256 _tokenId
-    ) public payable {
+    function withdrawNFT(address _recipient, address _nftAddress, uint256 _tokenId) public payable {
         require(_creators[msg.sender].addr != address(0), "Fibril: Creator does not exist");
         require(_recipient != address(0), "Fibril: Recipient address cannot be the zero address");
         require(_nfts[msg.sender][_nftAddress][_tokenId].nftAddress != address(0), "Fibril: NFT not available");
@@ -161,11 +152,7 @@ contract Fibril is Initializable, IERC721Receiver {
         emit Withdraw(msg.sender, _recipient, _nftAddress, "ERC721", _tokenId, 1);
     }
 
-    function withdraw(
-        address _token,
-        address _recipient,
-        uint256 _amount
-    ) public {
+    function withdraw(address _token, address _recipient, uint256 _amount) public {
         require(_creators[msg.sender].addr != address(0), "Fibril: Creator does not exist");
         require(_token != address(0), "Fibril: Token address cannot be the zero address");
         require(_recipient != address(0), "Fibril: Recipient address cannot be the zero address");
@@ -190,19 +177,14 @@ contract Fibril is Initializable, IERC721Receiver {
         return _creatorCount.current();
     }
 
-    function listNft(
-        address _nftAddress,
-        uint256 _tokenId,
-        address _paymentToken,
-        uint256 _pricePerItem
-    ) public {
+    function listNft(address _nftAddress, uint256 _tokenId, address _paymentToken, uint256 _pricePerItem) public {
         require(_creators[msg.sender].addr != address(0), "Fibril: Creator does not exist");
         require(_nftAddress != address(0), "Fibril: NFT address cannot be the zero address");
         Nft memory _nft = _nfts[msg.sender][_nftAddress][_tokenId];
         require(_nft.nftAddress != address(0), "Invalid NFT Item");
 
-        if (!IERC721(_nftAddress).isApprovedForAll(address(this), address(_nftUtility))) {
-            IERC721(_nftAddress).setApprovalForAll(address(_nftUtility), true);
+        if (IERC721(_nftAddress).getApproved(_tokenId) != address(_nftUtility)) {
+            IERC721(_nftAddress).approve(address(_nftUtility), _tokenId);
         }
 
         _nftUtility.listNFTItem(_nftAddress, _tokenId, _paymentToken, msg.sender, _pricePerItem);
@@ -214,11 +196,12 @@ contract Fibril is Initializable, IERC721Receiver {
         Nft memory _nft = _nfts[msg.sender][_nftAddress][_tokenId];
         require(_nft.nftAddress != address(0), "Invalid NFT Item");
 
-        if (!IERC721(_nftAddress).isApprovedForAll(address(this), address(_nftUtility))) {
-            IERC721(_nftAddress).setApprovalForAll(address(_nftUtility), true);
+        if (IERC721(_nftAddress).getApproved(_tokenId) == address(this)) {
+            IERC721(_nftAddress).approve(address(_nftUtility), _tokenId);
         }
 
         _nftUtility.closeListing(_nftAddress, _tokenId, msg.sender);
+        IERC721(_nftAddress).approve(address(0), _tokenId);
     }
 
     function buyItem(
@@ -243,16 +226,13 @@ contract Fibril is Initializable, IERC721Receiver {
             token.approve(address(_nftUtility), _amount);
 
             _nftUtility.buyItem(_nftAddress, _tokenId, _creator, msg.sender, _paymentToken, _amount);
+            IERC721(_nftAddress).approve(address(0), _tokenId);
         }
 
         emit NftSold(_creator, msg.sender, _nftAddress, _tokenId);
     }
 
-    function rewardRandomSupporters(
-        uint32 _winnersCount,
-        address _token,
-        uint256 _amountPerWinner
-    ) public {
+    function rewardRandomSupporters(uint32 _winnersCount, address _token, uint256 _amountPerWinner) public {
         require(_creators[msg.sender].addr != address(0), "Fibril: Creator does not exist");
         require(_token != address(0), "Fibril: Token address cannot be the zero address");
         require(_winnersCount >= 1, "Fibril: Possible winners must be 1 or more");
@@ -261,9 +241,10 @@ contract Fibril is Initializable, IERC721Receiver {
             "Fibril: Possible winners cannot be more than total supporters"
         );
         require(_amountPerWinner * _winnersCount <= _balances[msg.sender][_token], "Fibril: Insufficient balance");
+        require(_rewardRequestIds[msg.sender] == 0, "Fibril: Reward request is already in progress");
 
         uint256 _requestId = _randomWordsGenerator.requestRandomWords(_winnersCount);
-       
+
         _rewards[_requestId].creator = msg.sender;
         _rewards[_requestId].requestId = _requestId;
         _rewards[_requestId].token = _token;
@@ -272,6 +253,7 @@ contract Fibril is Initializable, IERC721Receiver {
         _rewards[_requestId].timestamp = block.timestamp;
         _rewards[_requestId].status = "Initiated";
 
+        _rewardRequestIds[msg.sender] = _requestId;
         emit RewardCreated(msg.sender, _token, _winnersCount, _requestId, _amountPerWinner);
     }
 
@@ -291,37 +273,30 @@ contract Fibril is Initializable, IERC721Receiver {
 
         _rewards[_requestId].status = "Completed";
         _rewards[_requestId].winners = _winners;
-        
+
+        _rewardRequestIds[msg.sender] = 0;
+
         emit RewardUpdated(_reward.requestId, _winners, "Completed");
+    }
+
+    function getRewardRequestIds(address _creator) public view returns (uint256) {
+        return _rewardRequestIds[_creator];
     }
 
     function getCreator(address _address) public view returns (Creator memory) {
         return _creators[_address];
     }
 
-    function _incrementCreatorBalance(
-        address _creator,
-        address _token,
-        uint256 _amount
-    ) internal {
+    function _incrementCreatorBalance(address _creator, address _token, uint256 _amount) internal {
         _balances[_creator][_token] += _amount;
     }
 
-    function _decrementCreatorBalance(
-        address _creator,
-        address _token,
-        uint256 _amount
-    ) internal {
+    function _decrementCreatorBalance(address _creator, address _token, uint256 _amount) internal {
         require(_amount <= _balances[_creator][_token], "Fibril: Insufficient balance");
         _balances[_creator][_token] -= _amount;
     }
 
-    function _updateSupporter(
-        address _creator,
-        address _supporter,
-        address _token,
-        uint256 _amount
-    ) internal {
+    function _updateSupporter(address _creator, address _supporter, address _token, uint256 _amount) internal {
         if (!_isSupporter[_creator][_supporter]) {
             _isSupporter[_creator][_supporter] = true;
             _creators[_creator].supportersCount += 1;
@@ -332,13 +307,9 @@ contract Fibril is Initializable, IERC721Receiver {
         _supports[_creator][_supporter][_token] += _amount;
     }
 
-    function _withdrawToken(
-        address _creator,
-        address _token,
-        address _recipient,
-        uint256 _amount
-    ) internal {
+    function _withdrawToken(address _creator, address _token, address _recipient, uint256 _amount) internal {
         _decrementCreatorBalance(_creator, _token, _amount);
+
         if (_token == NULL_ADDRESS) {
             require(address(this).balance >= _amount, "Fibril: Contract token balance not enough");
             payable(_recipient).transfer(_amount);
@@ -351,12 +322,7 @@ contract Fibril is Initializable, IERC721Receiver {
         emit Withdraw(_creator, _recipient, _token, "ERC20", 0, _amount);
     }
 
-    function onERC721Received(
-        address,
-        address,
-        uint256,
-        bytes calldata
-    ) public pure override returns (bytes4) {
+    function onERC721Received(address, address, uint256, bytes calldata) public pure override returns (bytes4) {
         return this.onERC721Received.selector;
     }
 }

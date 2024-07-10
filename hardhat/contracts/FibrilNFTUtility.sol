@@ -52,11 +52,7 @@ contract FibrilNFTUtility is Initializable {
         return address(_NFTContract);
     }
 
-    function getListing(
-        address _nftContract,
-        address _owner,
-        uint256 _tokenId
-    ) public view returns (Listing memory) {
+    function getListing(address _nftContract, address _owner, uint256 _tokenId) public view returns (Listing memory) {
         return _listings[_nftContract][_tokenId][_owner];
     }
 
@@ -97,20 +93,11 @@ contract FibrilNFTUtility is Initializable {
         );
     }
 
-    function closeListing(
-        address _nftAddress,
-        uint256 _tokenId,
-        address _listedBy
-    ) public {
+    function closeListing(address _nftAddress, uint256 _tokenId, address _listedBy) public {
         _closeListing(_nftAddress, _tokenId, _listedBy);
     }
 
-    function updateListing(
-        address _nftAddress,
-        uint256 _tokenId,
-        address _payToken,
-        uint256 _newPrice
-    ) public {
+    function updateListing(address _nftAddress, uint256 _tokenId, address _payToken, uint256 _newPrice) public {
         Listing storage _listing = _listings[_nftAddress][_tokenId][msg.sender];
 
         _ensurevalidNft(_nftAddress, _tokenId, msg.sender);
@@ -119,13 +106,7 @@ contract FibrilNFTUtility is Initializable {
         _listing.pricePerItem = _newPrice;
     }
 
-    function transferItem(
-        address _nftAddress,
-        uint256 _tokenId,
-        address _owner,
-        address _recipient,
-        uint256
-    ) public {
+    function transferItem(address _nftAddress, uint256 _tokenId, address _owner, address _recipient, uint256) public {
         _ensurevalidNft(_nftAddress, _tokenId, _owner);
         _transferItem(_nftAddress, _tokenId, _owner, _recipient);
     }
@@ -156,12 +137,7 @@ contract FibrilNFTUtility is Initializable {
         _transferItem(_listing.nftAddress, _listing.tokenId, _owner, _buyFor);
     }
 
-    function _transferItem(
-        address _nftAddress,
-        uint256 _tokenId,
-        address _owner,
-        address _recipient
-    ) internal {
+    function _transferItem(address _nftAddress, uint256 _tokenId, address _owner, address _recipient) internal {
         if (IERC165(_nftAddress).supportsInterface(ERC721_INTERFACE_ID)) {
             IERC721(_nftAddress).safeTransferFrom(_owner, _recipient, _tokenId);
         } else {
@@ -169,25 +145,17 @@ contract FibrilNFTUtility is Initializable {
         }
     }
 
-    function _ensurevalidNft(
-        address _nftAddress,
-        uint256 _tokenId,
-        address _owner
-    ) internal view {
+    function _ensurevalidNft(address _nftAddress, uint256 _tokenId, address _owner) internal view {
         if (IERC165(_nftAddress).supportsInterface(ERC721_INTERFACE_ID)) {
             IERC721 nft = IERC721(_nftAddress);
             require(nft.ownerOf(_tokenId) == _owner, "Not owning Item");
-            require(nft.isApprovedForAll(_owner, address(this)), "Item not approved");
+            require(nft.getApproved(_tokenId) == address(this), "Item not approved");
         } else {
             revert("Invalid NFT address");
         }
     }
 
-    function _closeListing(
-        address _nftAddress,
-        uint256 _tokenId,
-        address _listedBy
-    ) internal {
+    function _closeListing(address _nftAddress, uint256 _tokenId, address _listedBy) internal {
         Listing memory _listing = _listings[_nftAddress][_tokenId][_listedBy];
 
         _ensurevalidNft(_nftAddress, _tokenId, msg.sender);
