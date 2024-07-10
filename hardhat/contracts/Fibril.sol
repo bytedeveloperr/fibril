@@ -95,7 +95,7 @@ contract Fibril is Initializable, IERC721Receiver {
     function support(address _creator, address _token, uint256 _amount) public {
         require(_creator != address(0), "Fibril: Creator cannot be the zero address");
         require(_token != address(0), "Fibril: Token address cannot be the zero address");
-        require(_amount >= 0, "Fibril: Amount cannot be zero or less");
+        require(_amount > 0, "Fibril: Amount cannot be zero or less");
 
         if (_creators[_creator].addr == address(0)) {
             _addCreator(_creator);
@@ -115,7 +115,7 @@ contract Fibril is Initializable, IERC721Receiver {
 
     function supportWithETH(address _creator) public payable {
         require(_creator != address(0), "Fibril: Creator cannot be the zero address");
-        require(msg.value >= 0, "Fibril: Amount cannot be zero or less");
+        require(msg.value > 0, "Fibril: Amount cannot be zero or less");
 
         if (_creators[_creator].addr == address(0)) {
             _addCreator(_creator);
@@ -156,7 +156,7 @@ contract Fibril is Initializable, IERC721Receiver {
         require(_creators[msg.sender].addr != address(0), "Fibril: Creator does not exist");
         require(_token != address(0), "Fibril: Token address cannot be the zero address");
         require(_recipient != address(0), "Fibril: Recipient address cannot be the zero address");
-        require(_amount >= 0, "Fibril: Amount cannot be zero or less");
+        require(_amount > 0, "Fibril: Amount cannot be zero or less");
 
         _withdrawToken(_creators[msg.sender].addr, _token, _recipient, _amount);
     }

@@ -2,6 +2,7 @@ require("@nomiclabs/hardhat-waffle")
 require("@openzeppelin/hardhat-upgrades")
 require("@nomiclabs/hardhat-etherscan")
 require("solidity-coverage")
+require("@nomicfoundation/hardhat-chai-matchers")
 
 require("dotenv").config();
 
